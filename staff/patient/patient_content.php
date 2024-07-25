@@ -3,8 +3,9 @@
 include_once ('../../config.php');
 
 
-$sql = "SELECT * FROM patients WHERE is_active = 0 AND patients.is_deleted = 0 ORDER BY serial_no DESC";
-
+$sql = "SELECT *,CONCAT(patients.last_name, ', ', patients.first_name) AS full_name
+FROM patients 
+WHERE is_active = 0 AND patients.is_deleted = 0 ORDER BY serial_no DESC";
 
 $result = $conn->query($sql);
 
@@ -77,7 +78,7 @@ if ($result2->num_rows > 0) {
                             <label for="">Select Step</label>
                             <select class="form-control" name="step" id="step" required class="">
                                 <option value="" disabled selected hidden>Select a Step</option>
-                                <option value="Interview Staff">Interview Staff</option>
+                                <option value="Walk In">Interview Staff</option>
                                 <option value="Consultation">Consultation</option>
                                 <option value="Immunization">Immunization</option>
                                 <option value="Prenatal">Prenatal</option>
@@ -87,6 +88,7 @@ if ($result2->num_rows > 0) {
                                 <option value="Midwife">Midwife</option>
                                 <option value="Head Nurse">Head Nurse</option>
                                 <option value="Prescription">Prescription</option>
+                                <option value="Online Register">Online Register</option>
                             </select>
                             <!-- <div id="editStatus_error" class="error"></div> -->
                         </div>
@@ -95,15 +97,19 @@ if ($result2->num_rows > 0) {
                             <div class="col-md-6">
                                 <!-- Adjusted column size for small screens -->
                                 <div class="form-group">
-                                    <label for="first_name">First Name</label>
-                                    <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                    <label for="first_name">First Name</label><span
+                                        style="color: red; font-size: 22px;">*</span>
+                                    <input type="text" class="form-control" id="first_name" name="first_name"
+                                        placeholder="Enter Your Firstname" required>
                                     <div id="first_name_error" class="error"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="last_name">Last Name</label>
-                                    <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                    <label for="last_name">Last Name</label><span
+                                        style="color: red; font-size: 22px;">*</span>
+                                    <input type="text" class="form-control" id="last_name" name="last_name"
+                                        placeholder="Enter your Lastname" required>
                                     <div id="last_name_error" class="error"></div>
                                 </div>
                             </div>
@@ -112,18 +118,29 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="middle_name">Middle Name</label>
+                                    <label for="middle_name">Middle Name</label><span
+                                        style="font-size: 14px;">(optional)</span>
                                     <input type="text" class="form-control" id="middle_name" name="middle_name"
-                                        required>
+                                        placeholder="Enter your Middlename">
                                     <div id="middle_name_error" class="error"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="suffix">Suffix</label>
-                                    <input type="text" class="form-control" id="suffix" name="suffix" required>
+                                    <label for="suffix">Suffix</label><span style="font-size: 14px;">(optional)</span>
+                                    <select class="form-control" id="suffix" name="suffix">
+                                        <option value="" selected disabled hidden>Choose a suffix</option>
+                                        <option value="None">None</option>
+                                        <option value="Jr.">Jr.</option>
+                                        <option value="Sr.">Sr.</option>
+                                        <option value="II">II</option>
+                                        <option value="III">III</option>
+                                        <option value="IV">IV</option>
+                                        <option value="V">V</option>
+                                    </select>
                                     <div id="suffix_error" class="error"></div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -132,7 +149,8 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="gender">Select Gender</label>
+                                    <label for="gender">Select Gender</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <select class="form-control" name="gender" id="gender" required>
                                         <option value="" disabled selected hidden>Select Gender</option>
                                         <option value="Male">Male</option>
@@ -143,12 +161,19 @@ if ($result2->num_rows > 0) {
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="contact_no">Contact No</label>
-                                    <input type="number" class="form-control" id="contact_no" name="contact_no"
-                                        required>
-                                    <div id="contact_error" class="error"></div>
+                                    <label for="contact_no">Contact No</label><span
+                                        style="color: red; font-size: 22px;">*</span>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon3">+63</span>
+                                        </div>
+                                        <input type="text" class="form-control" id="contact_no" name="contact_no"
+                                            required>
+                                        <div id="contact_error" class="error"></div>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
 
                         <!-- Add more rows/columns as needed -->
@@ -156,7 +181,8 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="civil_status">Civil Status</label>
+                                    <label for="civil_status">Civil Status</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <select class="form-control" name="civil_status" id="civil_status" required>
                                         <option value="" disabled selected hidden>Select Civil Status</option>
                                         <option value="Single">Single</option>
@@ -169,7 +195,8 @@ if ($result2->num_rows > 0) {
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="birthdate">Birthdate</label>
+                                    <label for="birthdate">Birthdate</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input type="date" class="form-control" id="birthdate" name="birthdate" required>
                                     <div id="birthdate_error" class="error"></div>
                                 </div>
@@ -181,8 +208,8 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="age">Age</label>
-                                    <p id="age" class="form-control" name="age"></p>
+                                    <label for="age">Age (Click The Birthdate First)</label>
+                                    <p id="age" class="form-control" name="age" readonly></p>
                                     <div id="age_error" class="error"></div>
                                 </div>
                             </div>
@@ -201,13 +228,20 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="religion">Religion</label>
+                                    <label for="religion">Religion</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <select class="form-control" name="religion" id="religion" required>
                                         <option value="" disabled selected hidden>Select Religion</option>
                                         <option value="Roman Catholic">Roman Catholic</option>
                                         <option value="Muslim">Muslim</option>
                                         <option value="Iglesia ni Cristo">Iglesia ni Cristo</option>
                                         <option value="Protestantism">Protestantism</option>
+                                        <option value="Aglipayan">Aglipayan</option>
+                                        <option value="Buddhism">Buddhism</option>
+                                        <option value="Hinduism">Hinduism</option>
+                                        <option value="Judaism">Judaism</option>
+                                        <option value="Eastern Orthodox">Eastern Orthodox</option>
+                                        <option value="Sikhism">Sikhism</option>
                                         <option value="Other or Non-religious">Other or Non-religious</option>
                                     </select>
                                     <div id="religion_error" class="error"></div>
@@ -218,16 +252,60 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
+                                    <label for="address">Address</label><span
+                                        style="color: red; font-size: 22px;">*</span>
+                                    <select class="form-control" id="address" name="address" required>
+                                        <option value="" disabled selected>Select your address</option>
+                                        <option value="Zone 1">Zone 1, Bulua,
+                                            Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 2">Zone 2, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 3">Zone 3, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 4">Zone 4, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 5">Zone 5, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 6">Zone 6, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 7">Zone 7, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 8">Zone 8, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 9">Zone 9, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 10">Zone 10, Bulua, Cagayan de
+                                            Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 11">Zone 11, Bulua, Cagayan de
+                                            Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 12">Zone 12, Bulua, Cagayan de
+                                            Oro,
+                                            Misamis Oriental</option>
+
+
+                                        <!-- Add more address options as needed -->
+                                    </select>
+                                    <div id="address_error" class="error"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
                                     <label for="address">Address</label>
                                     <textarea class="form-control" id="address" name="address" rows="3"
                                         required></textarea>
                                     <div id="address_error" class="error"></div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Add more fields here if needed -->
                         <!-- Add a button to trigger the addition of child information -->
-                        <button id="addChildButton" class="btn btn-primary">Add Child Information</button>
+                        <!-- <button id="addChildButton" class="btn btn-primary">Add Child Information</button> -->
 
                         <!-- Placeholder for child information -->
                         <div id="childInformationPlaceholder"></div>
@@ -241,14 +319,14 @@ if ($result2->num_rows > 0) {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="first_name_child">First Name</label>
-                        <input type="text" class="form-control" name="first_name_child" required>
+                        <input type="text" class="form-control" name="first_name_child" id="first_name_child" required>
                         <div class="error"></div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="last_name_child">Last Name</label>
-                        <input type="text" class="form-control" name="last_name_child" required>
+                        <input type="text" class="form-control" name="last_name_child" id="last_name_child" required>
                         <div class="error"></div>
                     </div>
                 </div>
@@ -257,14 +335,14 @@ if ($result2->num_rows > 0) {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="middle_name_child">Middle Name</label>
-                        <input type="text" class="form-control" name="middle_name_child" required>
+                        <input type="text" class="form-control" name="middle_name_child" id="middle_name_child" required>
                         <div class="error"></div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="suffix_child">Suffix</label>
-                        <input type="text" class="form-control" name="suffix_child" required>
+                        <input type="text" class="form-control" name="suffix_child" id="suffix_child" required>
                         <div class="error"></div>
                     </div>
                 </div>
@@ -273,7 +351,7 @@ if ($result2->num_rows > 0) {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="gender_child">Select Gender</label>
-                        <select class="form-control" name="gender_child" required>
+                        <select class="form-control" name="gender_child" id="gender_child" required>
                             <option value="" disabled selected hidden>Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -284,7 +362,7 @@ if ($result2->num_rows > 0) {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="birthdate_child">Birthdate</label>
-                        <input type="date" class="form-control" name="birthdate_child" required>
+                        <input type="date" class="form-control" name="birthdate_child" id="birthdate_child" required>
                         <div class="error"></div>
                     </div>
                 </div>
@@ -326,12 +404,26 @@ if ($result2->num_rows > 0) {
                             // Add an event listener to the button to trigger the addition of child information
                             document.getElementById('addChildButton').addEventListener('click', addChildInformation);
                         </script>
+                        <script>
+                            // Function to set "None" value for all child information fields
+                            function setNoneForChild() {
+                                // Get all input and textarea elements within the child information section
+                                var childInputs = document.querySelectorAll('#childInformationPlaceholder input, #childInformationPlaceholder textarea');
+
+                                // Loop through each input and set its value to "None"
+                                childInputs.forEach(function (input) {
+                                    input.value = 'None';
+                                });
+                            }
+                        </script>
 
 
 
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <!-- <button type="button" class="btn btn-warning" id="NoneChildButton"
+                        onclick="setNoneForChild()">Doesn't Have a Child</button> -->
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"
                         id="closeModalButton">Close</button>
                     <button type="button" class="btn btn-primary" id="addPatientButton">Save</button>
@@ -339,11 +431,13 @@ if ($result2->num_rows > 0) {
             </div>
         </div>
     </div>
+
+
     <script>
         // Add an event listener to the Save button
         document.getElementById('addPatientButton').addEventListener('click', function () {
             // Assuming you have a variable `completedStep` that holds the completed step value, e.g., "Step1", "Step2", etc.
-            var completedStep = "Interview Staff"; // Example completed step
+            var completedStep = "Walk In"; // Example completed step
 
             // Get the select element
             var selectStep = document.getElementById('step');
@@ -356,26 +450,57 @@ if ($result2->num_rows > 0) {
                 }
             }
         });
-
     </script>
+
     <script>
         function calculateAge() {
             const birthdate = new Date(document.getElementById("birthdate").value);
             const today = new Date();
-            let ages = today.getFullYear() - birthdate.getFullYear();
 
-            // Check if the birthday has occurred this year
-            if (
-                today.getMonth() < birthdate.getMonth() ||
-                (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate())
-            ) {
-                ages--;
+            let years = today.getFullYear() - birthdate.getFullYear();
+            let months = today.getMonth() - birthdate.getMonth();
+            let days = today.getDate() - birthdate.getDate();
+
+            // Adjust for negative days and months
+            if (days < 0) {
+                months--;
+                const daysInPreviousMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+                days += daysInPreviousMonth;
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            let ageDisplay;
+
+            if (years > 0) {
+                ageDisplay = `${years} ${years === 1 ? "year" : "years"} old`;
+                if (months > 0 || days > 0) {
+                    ageDisplay += `, ${months} ${months === 1 ? "month" : "months"} and ${days} ${days === 1 ? "day" : "days"}`;
+                }
+            } else if (years === 1 && months === 0 && days >= 0) {
+                ageDisplay = "1 year old";
+            } else if (months > 0) {
+                ageDisplay = `${months} ${months === 1 ? "month" : "months"} and ${days} ${days === 1 ? "day" : "days"}`;
+            } else {
+                const diffTime = today - birthdate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays < 7) {
+                    ageDisplay = `${diffDays} ${diffDays === 1 ? "day" : "days"}`;
+                } else {
+                    const weeks = Math.floor(diffDays / 7);
+                    const remainingDays = diffDays % 7;
+                    ageDisplay = `${weeks} ${weeks === 1 ? "week" : "weeks"} and ${remainingDays} ${remainingDays === 1 ? "day" : "days"}`;
+                }
             }
 
             // Update the age display
-            document.getElementById("age").innerText = ages;
+            document.getElementById("age").innerText = ageDisplay;
         }
 
+        // Set the max date for the birthdate input to today
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0'); // Add 1 to month since it's zero-based
@@ -396,11 +521,11 @@ if ($result2->num_rows > 0) {
                         <tr>
                             <th style="display:none;">ID</th>
                             <th>Serial Number</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
+                            <th>Full Name</th>
+                            <!-- <th>Child Name</th> -->
                             <th>Birthdate</th>
                             <th>Address</th>
-                            <th>Process</th>
+                            <th>Register Type</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -417,11 +542,11 @@ if ($result2->num_rows > 0) {
                                         <?php echo $row['serial_no']; ?>
                                     </td>
                                     <td class="align-middle">
-                                        <?php echo $row['first_name']; ?>
+                                        <?php echo $row['full_name']; ?>
                                     </td>
-                                    <td class="align-middle">
-                                        <?php echo $row['last_name']; ?>
-                                    </td>
+                                    <!-- <td class="align-middle">
+                                        <?php echo $row['Child']; ?>
+                                    </td> -->
                                     <td class="align-middle">
                                         <?php echo $row['birthdate']; ?>
                                     </td>
@@ -443,6 +568,12 @@ if ($result2->num_rows > 0) {
                                         </button>
                                         <button type="button" class="btn btn-danger deletebtn"
                                             data-id="' + row.serial_no + '"><i class="fas fa-user-times"></i> Inactive</button>
+                                        <!-- Button trigger modal -->
+                                        <!-- <button type="button" class="btn btn-primary childbtn" data-toggle="modal"
+                                            data-target="#childModal_<?php echo $row['serial_no']; ?>">
+                                            Child Details
+                                        </button> -->
+
                                     </td>
                                 </tr>
                                 <?php
@@ -457,6 +588,8 @@ if ($result2->num_rows > 0) {
                                 <td class="align-middle"></td>
                                 <td class="align-middle"></td>
                                 <td class="align-middle"></td>
+                                <!-- <td class="align-middle"></td> -->
+
 
                             </tr>
                             <?php
@@ -467,6 +600,31 @@ if ($result2->num_rows > 0) {
             </div>
         </div>
     </div>
+    <!-- Child Modal -->
+    <!-- <div class="modal fade" id="childModal" tabindex="-1" role="dialog" aria-labelledby="childModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="childModalLabel">Child Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body"> -->
+    <!-- Child details go here -->
+    <!-- <p id="childName"></p>
+    <p id="childBirthdate"></p>
+    <p id="childAddress"></p>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+</div>
+</div>
+</div>
+</div> -->
+
+
 
     <!-- modal edit -->
     <!-- Edit Patient Modal -->
@@ -482,10 +640,10 @@ if ($result2->num_rows > 0) {
                 </div>
                 <div class="modal-body">
                     <div class="form-group ">
-                        <label for="">Select Step</label>
+                        <label for="">Select Process</label>
                         <select class="form-control" name="step" id="editstep" required class="">
-                            <option value="" disabled selected hidden>Select a Step</option>
-                            <option value="Interview Staff">Interview Staff</option>
+                            <option value="" disabled selected hidden>Select a Process</option>
+                            <option value="Walk In">Interview Staff</option>
                             <option value="Consultation">Consultation</option>
                             <option value="Immunization">Immunization</option>
                             <option value="Prenatal">Prenatal</option>
@@ -495,6 +653,7 @@ if ($result2->num_rows > 0) {
                             <option value="Midwife">Midwife</option>
                             <option value="Head Nurse">Head Nurse</option>
                             <option value="Prescription">Prescription</option>
+                            <option value="Online Register">Online Register</option>
                         </select>
                         <!-- <div id="editStatus_error" class="error"></div> -->
                     </div>
@@ -505,7 +664,7 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="first_name">First Name</label>
+                                    <label for="first_name">First Name</label><span style="color: red; font-size: 18px">*</span>
                                     <input type="text" class="form-control" id="editFirstname" name="first_name"
                                         required>
                                     <div id="editFirstName_error" class="error"></div>
@@ -513,7 +672,7 @@ if ($result2->num_rows > 0) {
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="last_name">Last Name</label>
+                                    <label for="last_name">Last Name</label><span style="color: red; font-size: 18px">*</span>
                                     <input type="text" class="form-control" id="editLastname" name="last_name" required>
                                     <div id="editLastname_error" class="error"></div>
                                 </div>
@@ -523,25 +682,37 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="middle_name">Middle Name</label>
+                                    <label for="middle_name">Middle Name</label><span style="color: black; font-size: 15px">(optional)</span>
                                     <input type="text" class="form-control" id="editMiddlename" name="middle_name"
-                                        required>
-                                    <div id="editMiddleName_error" class="error"></div>
+                                        >
+                                    <!-- <div id="editMiddleName_error" class="error"></div> -->
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="suffix">Suffix</label>
-                                    <input type="text" class="form-control" id="editSuffix" name="suffix" required>
+                                    <label for="editSuffix">Suffix</label><span style="color: black; font-size: 15px">(optional)</span>
+                                    <select class="form-control" id="editSuffix" name="suffix" >
+                                        <option value="" selected disabled hidden>Choose a suffix</option>
+                                        <option value="None">None</option>
+                                        <option value="Jr.">Jr.</option>
+                                        <option value="Sr.">Sr.</option>
+                                        <option value="II">II</option>
+                                        <option value="III">III</option>
+                                        <option value="IV">IV</option>
+                                        <option value="V">V</option>
+
+                                    </select>
                                     <div id="editSuffixName_error" class="error"></div>
                                 </div>
+
+
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="gender">Select Gender</label>
+                                    <label for="gender">Select Gender</label><span style="color: red; font-size: 18px">*</span>
                                     <select class="form-control" name="gender" id="editGender" required>
                                         <option value="" disabled selected hidden>Select Gender</option>
                                         <option value="Male">Male</option>
@@ -550,12 +721,24 @@ if ($result2->num_rows > 0) {
                                     <div id="editgender_error" class="error"></div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="contact_no">Contact No</label>
-                                    <input type="number" class="form-control" id="editContact_no" name="contact_no"
-                                        required>
+                                    <input type="number" class="form-control" id="editContact_no" name="contact_no" required>
                                     <div id="editContact_error" class="error"></div>
+                                </div>
+                            </div> -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="contact_no">Contact No</label><span style="color: red; font-size: 18px">*</span>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon3">+63</span>
+                                        </div>
+                                        <input type="number" class="form-control" id="editContact_no" name="contact_no"
+                                            required>
+                                        <div id="editContact_error" class="error"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -563,7 +746,7 @@ if ($result2->num_rows > 0) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="civil_status">Civil Status</label>
+                                    <label for="civil_status">Civil Status</label><span style="color: red; font-size: 18px">*</span>
                                     <select class="form-control" name="civil_status" id="editCivilstatus" required>
                                         <option value="" disabled selected hidden>Select Civil Status</option>
                                         <option value="Single">Single</option>
@@ -576,7 +759,7 @@ if ($result2->num_rows > 0) {
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="birthdate">Birthdate</label>
+                                    <label for="birthdate">Birthdate</label><span style="color: red; font-size: 18px">*</span>
                                     <input type="date" class="form-control" id="editBirthdate" name="birthdate"
                                         required>
                                     <div id="editBirthDate_error" class="error"></div>
@@ -596,13 +779,14 @@ if ($result2->num_rows > 0) {
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="age">Age</label>
-                                    <input type="number" class="form-control" id="editAge" name="age" required>
+                                    <input type="number" class="form-control" id="editAge" name="age" disabled required>
                                     <div id="editAge_error" class="error"></div>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="serial_no">Serial No</label>
+                                    <label for="serial_no">Family No.</label>
                                     <input type="text" class="form-control" id="editSerial_no" name="serial_no" required
                                         readonly>
                                     <div id="editSerial_error" class="error"></div>
@@ -611,15 +795,21 @@ if ($result2->num_rows > 0) {
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="religion">Religion</label>
+                                    <label for="religion">Religion</label><span style="color: red; font-size: 18px">*</span>
                                     <select class="form-control" name="religion" id="editReligion" required>
                                         <option value="" disabled selected hidden>Select Religion</option>
                                         <option value="Roman Catholic">Roman Catholic</option>
                                         <option value="Muslim">Muslim</option>
                                         <option value="Iglesia ni Cristo">Iglesia ni Cristo</option>
                                         <option value="Protestantism">Protestantism</option>
+                                        <option value="Aglipayan">Aglipayan</option>
+                                        <option value="Buddhism">Buddhism</option>
+                                        <option value="Hinduism">Hinduism</option>
+                                        <option value="Judaism">Judaism</option>
+                                        <option value="Eastern Orthodox">Eastern Orthodox</option>
+                                        <option value="Sikhism">Sikhism</option>
                                         <option value="Other or Non-religious">Other or Non-religious</option>
                                     </select>
                                     <div id="EditReligion_error" class="error"></div>
@@ -627,17 +817,157 @@ if ($result2->num_rows > 0) {
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="address">Address</label>
-                                    <textarea class="form-control" id="editAddress" name="address" rows="3"
-                                        required></textarea>
+                                    <textarea class="form-control" id="editAddress" name="address" rows="3" required></textarea>
+                                    <div id="EditAddress_error" class="error"></div>
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="address">Address</label><span style="color: red; font-size: 18px">*</span>
+                                    <select class="form-control" id="editAddress" name="address" required>
+                                        <option value="" disabled selected>Select your address</option>
+                                        <option value="Zone 1">Zone 1, Bulua,
+                                            Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 2">Zone 2, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 3">Zone 3, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 4">Zone 4, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 5">Zone 5, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 6">Zone 6, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 7">Zone 7, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 8">Zone 8, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 9">Zone 9, Bulua, Cagayan de Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 10">Zone 10, Bulua, Cagayan de
+                                            Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 11">Zone 11, Bulua, Cagayan de
+                                            Oro,
+                                            Misamis Oriental</option>
+                                        <option value="Zone 12">Zone 12, Bulua, Cagayan de
+                                            Oro,
+                                            Misamis Oriental</option>
+
+                                    </select>
                                     <div id="EditAddress_error" class="error"></div>
                                 </div>
                             </div>
                         </div>
                         <!-- Add more fields here if needed -->
+                        <!-- Add a button to trigger the addition of child information -->
+                        <!-- <button id="UpdateChildButton" class="btn btn-primary">Add Child Information</button> -->
+
+                        <!-- Placeholder for child information -->
+                        <div id="childInformationPlaceholders"></div>
+
+                        <script>
+                            // Function to add a new set of child information fields
+                            function addChildInformations() {
+                                var childsInfoHTML = `
+            <h5>Child Information</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="first_name_child">First Name</label>
+                        <input type="text" class="form-control" name="first_name_child" id="first_name_child2" required>
+                        <div class="error"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="last_name_child">Last Name</label>
+                        <input type="text" class="form-control" name="last_name_child" id="last_name_child2" required>
+                        <div class="error"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="middle_name_child">Middle Name</label>
+                        <input type="text" class="form-control" name="middle_name_child" id="middle_name_child2" required>
+                        <div class="error"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="suffix_child">Suffix</label>
+                        <input type="text" class="form-control" name="suffix_child" id="suffix_child2" required>
+                        <div class="error"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="gender_child">Select Gender</label>
+                        <select class="form-control" name="gender_child" id="gender_child2" required>
+                            <option value="" disabled selected hidden>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <div class="error"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="birthdate_child">Birthdate</label>
+                        <input type="date" class="form-control" name="birthdate_child" id="birthdate_child2" required>
+                        <div class="error"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="birth_weight">Birth Weight</label>
+                        <input type="text" class="form-control" id="birth_weight2" name="birth_weight" required>
+                        <div class="error"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="birth_height">Birth Height</label>
+                        <input type="text" class="form-control" id="birth_height2" name="birth_height" required>
+                        <div class="error"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="place_of_birth">Place of Birth</label>
+                        <textarea class="form-control" id="place_of_birth2" name="place_of_birth" rows="3" required></textarea>
+                        <div id="place_of_birth_error" class="error"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        `;
+
+                                // Append the child information fields to the placeholder
+                                document.getElementById('childInformationPlaceholders').innerHTML += childsInfoHTML;
+                            }
+
+                            // Add an event listener to the button to trigger the addition of child information
+                            document.getElementById('UpdateChildButton').addEventListener('click', addChildInformations);
+                        </script>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -659,8 +989,56 @@ if ($result2->num_rows > 0) {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
+    document.getElementById("contact_no").addEventListener("input", function () {
+        var contactInput = document.getElementById("contact_no").value.trim();
+        if (contactInput.startsWith("0")) {
+            contactInput = contactInput.substring(1);
+        }
+        document.getElementById("contact_no").value = contactInput;
+    });
+
     $(document).ready(function () {
 
+        $('#contact_no').on('input', function () {
+            var contactNo = $(this).val();
+            if (contactNo.length < 10) {
+                $('#contact_error').text('\nInvalid Phone number.');
+            } else if (!contactNo.startsWith("9")) {
+                $('#contact_error').text('\nInvalid Phone number. Phone number should start with 9');
+            } else {
+                $('#contact_error').text('');
+            }
+
+
+            if (contactNo.length > 10) {
+                $(this).val(contactNo.substring(0, 10));
+            }
+        });
+
+
+        $('#editContact_no').on('input', function () {
+            var editcontactNo = $(this).val();
+            if (editcontactNo.length < 10) {
+                $('#editContact_error').text('\nInvalid Phone number.');
+            } else if (!editcontactNo.startsWith("9")) {
+                $('#editContact_error').text('\nInvalid Phone number. Phone number should start with 9');
+            } else {
+                $('#editContact_error').text('');
+            }
+
+
+            if (contactNo.length > 10) {
+                $(this).val(contactNo.substring(0, 10));
+            }
+        });
+
+        var contactInput = document.getElementById("editContact_no").value.trim();
+
+        if (contactInput.startsWith("+63")) {
+            contactInput = contactInput.substring(3);
+        }
+
+        document.getElementById("editContact_no").value = contactInput;
 
         function updateSerialNumber() {
             $.ajax({
@@ -680,9 +1058,24 @@ if ($result2->num_rows > 0) {
         updateSerialNumber();
 
         // Optionally, update the serial number periodically
-        setInterval(updateSerialNumber, 5000); // Update every 5 seconds (adjust as needed)
+        setInterval(updateSerialNumber, 2000); // Update every 2 seconds
 
+        // Event listener for displaying child details modal
+        $('#patientTableBody').on('click', '.childbtn', function () {
+            var childName = $(this).data('name');
+            var childBirthdate = $(this).data('birthdate');
+            var childAddress = $(this).data('address');
 
+            // Set modal content
+            $('#childName').text('Child Name: ' + childName);
+            $('#childBirthdate').text('Birthdate: ' + childBirthdate);
+            $('#childAddress').text('Address: ' + childAddress);
+
+            // Show the modal
+            $('#childModal').modal('show');
+        });
+
+        //Modal add Patient
         document.getElementById('openModalButton').addEventListener('click', function () {
             $('#addPatientModal').modal('show'); // Show the modal
         });
@@ -690,50 +1083,91 @@ if ($result2->num_rows > 0) {
         // Check if there are rows in the PHP-generated table
         <?php if ($result->num_rows > 0): ?>
             var table = $('#patientTableBody').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id', visible: false },
-                    { targets: 1, data: 'serial_no' },
-                    { targets: 2, data: 'first_name' },
-                    { targets: 3, data: 'last_name' },
-                    { targets: 4, data: 'birthdate' },
-                    { targets: 5, data: 'address' },
-                    { targets: 6, data: 'step' },
-                    {
-                        targets: 7,
-                        searchable: false,
-                        data: null,
-                        render: function (data, type, row) {
-                            var viewRec = '<a href="history.php?id=' + row.id + '"><button type="button" class="btn btn-warning ml-1">  <i class="fas fa-eye"></i> View History</button></a>';
-                            var editButton = '<button type="button" class="btn btn-success editbtn" data-patient-id="' + row.serial_no + '"><i class="fas fa-edit"></i> Update</button>';
-                            var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.serial_no + '"><i class="fas fa-user-times"></i> Inactive</button>';
-                            return viewRec + ' ' + editButton + ' ' + deleteButton;
-                        }
-                    } // Action column
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id',
+                    visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'serial_no'
+                },
+                {
+                    targets: 2,
+                    data: 'full_name'
+                },
+                // { targets: 3, data: 'Child' },
+                {
+                    targets: 3,
+                    data: 'birthdate'
+                },
+                {
+                    targets: 4,
+                    data: 'address'
+                },
+                {
+                    targets: 5,
+                    data: 'step'
+                },
+                {
+                    targets: 6,
+                    searchable: false,
+                    data: null,
+                    render: function (data, type, row) {
+                        var viewRec = '<a href="history.php?id=' + row.id + '"><button type="button" class="btn btn-warning ml-1">  <i class="fas fa-eye"></i> View History</button></a>';
+                        var editButton = '<button type="button" class="btn btn-success editbtn" data-patient-id="' + row.serial_no + '"><i class="fas fa-edit"></i> Update</button>';
+                        var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.serial_no + '"><i class="fas fa-user-times"></i> Inactive</button>';
+                        // var childButton = '<button type="button" class="btn btn-primary childbtn" data-name="' + row.Child + '" data-birthdate="' + row.birthdate + '" data-address="' + row.address + '"><i class="fas fa-user"></i> View Child</button>';
+                        return viewRec + ' ' + editButton + ' ' + deleteButton;
+                    }
+                } // Action column
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
+
         <?php else: ?>
             // Initialize DataTable without the "Action" column when no rows are found
             var table = $('#patientTableBody').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id', visible: false },
-                    { targets: 1, data: 'serial_no' },
-                    { targets: 2, data: 'first_name' },
-                    { targets: 3, data: 'last_name' },
-                    { targets: 4, data: 'birthdate' },
-                    { targets: 5, data: 'address' },
-                    { targets: 6, data: 'step' }
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id',
+                    visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'serial_no'
+                },
+                {
+                    targets: 2,
+                    data: 'full_name'
+                },
+                // { targets: 3, data: 'Child' },
+                {
+                    targets: 3,
+                    data: 'birthdate'
+                },
+                {
+                    targets: 4,
+                    data: 'address'
+                },
+                {
+                    targets: 5,
+                    data: 'step'
+                }
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
         <?php endif; ?>
 
+
+
         $('#addPatientButton').click(function () {
-
-
-            // Get data from the form
 
             $('.error').text('');
 
@@ -754,11 +1188,6 @@ if ($result2->num_rows > 0) {
             var religion = $('#religion').val();
             var serial_no = $('#serial_no').val();
 
-            var religion = $('#religion').val();
-
-
-
-
 
 
             // Validate input fields
@@ -767,51 +1196,55 @@ if ($result2->num_rows > 0) {
             if (first_name.trim() === '' || last_name.trim() === '' || birthdate.trim() === '' || address.trim() === '') {
                 isValid = false;
                 $('#first_name_error').text('Field is required');
-            }
-            else {
+            } else {
                 isValid = true;
                 table.destroy(); // Destroy the existing DataTable
                 table = $('#patientTableBody').DataTable({
-                    columnDefs: [
-                        { targets: 0, data: 'id', visible: false },
-                        { targets: 1, data: 'serial_no' },
-                        { targets: 2, data: 'first_name' },
-                        { targets: 3, data: 'last_name' },
-                        { targets: 4, data: 'birthdate' },
-                        { targets: 5, data: 'address' },
-                        { targets: 6, data: 'step' },
-                        {
-                            targets: 7,
-                            searchable: false,
-                            data: null,
-                            render: function (data, type, row) {
-                                var viewRec = '<a href="history.php?id=' + row.id + '"><button type="button" class="btn btn-warning ml-1">  <i class="fas fa-eye"></i> View History</button></a>';
-                                var editButton = '<button type="button" class="btn btn-success editbtn" data-patient-id="' + row.serial_no + '"><i class="fas fa-edit"></i> Update</button>';
-                                var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.serial_no + '"><i class="fas fa-user-times"></i> Inactive</button>';
-                                return viewRec + ' ' + editButton + ' ' + deleteButton;
-                            }
-                        } // Action column
+                    columnDefs: [{
+                        targets: 0,
+                        data: 'id',
+                        visible: false
+                    },
+                    {
+                        targets: 1,
+                        data: 'serial_no'
+                    },
+                    {
+                        targets: 2,
+                        data: 'full_name'
+                    },
+                    // { targets: 3, data: 'Child' },
+                    {
+                        targets: 3,
+                        data: 'birthdate'
+                    },
+                    {
+                        targets: 4,
+                        data: 'address'
+                    },
+                    {
+                        targets: 5,
+                        data: 'step'
+                    },
+                    {
+                        targets: 6,
+                        searchable: false,
+                        data: null,
+                        render: function (data, type, row) {
+                            var viewRec = '<a href="history.php?id=' + row.id + '"><button type="button" class="btn btn-warning ml-1">  <i class="fas fa-eye"></i> View History</button></a>';
+                            var editButton = '<button type="button" class="btn btn-success editbtn" data-patient-id="' + row.serial_no + '"><i class="fas fa-edit"></i> Update</button>';
+                            var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.serial_no + '"><i class="fas fa-user-times"></i> Inactive</button>';
+                            // var childButton = '<button type="button" class="btn btn-primary childbtn" data-name="' + row.Child + '" data-birthdate="' + row.birthdate + '" data-address="' + row.address + '"><i class="fas fa-user"></i> View Child</button>';
+                            return viewRec + ' ' + editButton + ' ' + deleteButton;
+                        }
+                    } // Action column
                     ],
                     // Set the default ordering to 'id' column in descending order
-                    order: [[0, 'desc']]
+                    order: [
+                        [0, 'desc']
+                    ]
                 });
             }
-
-            // if (last_name.trim() === '') {
-            //     $('#last_name_error').text('Field is required');
-            //     isValid = false;
-            // }
-
-            // if (birthdate.trim() === '') {
-            //     $('#birthdate_error').text('Field is required');
-            //     isValid = false;
-            // }
-
-            // if (address.trim() === '') {
-            //     $('#address_error').text('Field is required');
-            //     isValid = false;
-            // }
-
 
 
             if (isValid == true) {
@@ -833,9 +1266,14 @@ if ($result2->num_rows > 0) {
                         civil_status: civil_status,
                         religion: religion,
                         serial_no: serial_no,
-                        religion: religion
+
                     },
                     success: function (response) {
+
+                        // if (document.getElementById("first_name_child").value != "") {
+                        //     addChild();
+                        // }
+
                         // Handle the response
                         if (response === 'Success') {
                             // Clear the form fields
@@ -917,7 +1355,9 @@ if ($result2->num_rows > 0) {
                     $.ajax({
                         url: 'action/delete_patient.php',
                         method: 'POST',
-                        data: { patient_id: patientId },
+                        data: {
+                            patient_id: patientId
+                        },
                         success: function (response) {
                             if (response === 'Success') {
                                 // Patient deleted successfully, update the table
@@ -944,7 +1384,9 @@ if ($result2->num_rows > 0) {
             $.ajax({
                 url: 'action/get_patient_by_id.php', // Replace with the actual URL to fetch patient data
                 method: 'POST',
-                data: { patient_id: patientId },
+                data: {
+                    patient_id: patientId
+                },
                 success: function (data) {
 
                     var patientData = data;
@@ -960,7 +1402,9 @@ if ($result2->num_rows > 0) {
                     $('#editPatientModal #editMiddlename').val(patientData.middle_name);
                     $('#editPatientModal #editSuffix').val(patientData.suffix);
                     $('#editPatientModal #editGender').val(patientData.gender);
-                    $('#editPatientModal #editContact_no').val(patientData.contact_no);
+                    var contactNo = patientData.contact_no.trim().replace(/\D/g, ''); // Remove non-numeric characters
+                    $('#editPatientModal #editContact_no').val(contactNo);
+                    // $('#editPatientModal #editContact_no').val(patientData.contact_no);
                     $('#editPatientModal #editCivilstatus').val(patientData.civil_status);
                     $('#editPatientModal #editAge').val(patientData.age);
                     $('#editPatientModal #editSerial_no').val(patientData.serial_no);
@@ -1019,15 +1463,15 @@ if ($result2->num_rows > 0) {
                 isValid = false;
             }
 
-            if (middleName.trim() === '') {
-                $('#editMiddleName_error').text('Field is required');
-                isValid = false;
-            }
+            // if (middleName.trim() === '') {
+            //     $('#editMiddleName_error').text('Field is required');
+            //     isValid = false;
+            // }
 
-            if (Suffix.trim() === '') {
-                $('#editSuffixName_error').text('Field is required');
-                isValid = false;
-            }
+            // if (Suffix.trim() === '') {
+            //     $('#editSuffixName_error').text('Field is required');
+            //     isValid = false;
+            // }
 
             if (Gender.trim() === '') {
                 $('#editgender_error').text('Field is required');
@@ -1116,11 +1560,72 @@ if ($result2->num_rows > 0) {
             }
         });
 
-
-
     });
 
+    // function addChild() {
+    //     var first_name_child = $('#first_name_child').val();
+    //     var last_name_child = $('#last_name_child').val();
+    //     var middle_name_child = $('#middle_name_child').val();
+    //     var suffix_child = $('#suffix_child').val();
+    //     var gender_child = $('#gender_child').val();
+    //     var birthdate_child = $('#birthdate_child').val();
+    //     var birth_weight = $('#birth_weight').val();
+    //     var birth_height = $('#birth_height').val();
+    //     var place_of_birth = $('#place_of_birth').val();
 
+    //     $.ajax({
+    //         url: 'action/add_child.php',
+    //         method: 'POST',
+    //         data: {
+    //             first_name_child: first_name_child,
+    //             last_name_child: last_name_child,
+    //             middle_name_child: middle_name_child,
+    //             suffix_child: suffix_child,
+    //             gender_child: gender_child,
+    //             birthdate_child: birthdate_child,
+    //             birth_weight: birth_weight,
+    //             birth_height: birth_height,
+    //             place_of_birth: place_of_birth
+    //         },
+    //         success: function (response) {
+    //             // Handle the response
+    //             if (response === 'Success') {
+
+    //                 $('#first_name_child').val('');
+    //                 $('#last_name_child').val('');
+    //                 $('#middle_name_child').val('');
+    //                 $('#suffix_child').val('');
+    //                 $('#gender_child').val('');
+    //                 $('#birthdate_child').val('');
+    //                 $('#birth_weight').val('');
+    //                 $('#birth_height').val('');
+    //                 $('#place_of_birth').val('');
+
+    //                 // Optionally, trigger additional actions or show a success message
+    //                 Swal.fire({
+    //                     icon: 'success',
+    //                     title: 'Success',
+    //                     text: 'Child added successfully',
+    //                 });
+    //             } else {
+    //                 // Show an error message
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Error',
+    //                     text: 'Error adding child: ' + response,
+    //                 });
+    //             }
+    //         },
+    //         error: function (error) {
+    //             // Handle errors
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Error',
+    //                 text: 'Error adding child: ' + error,
+    //             });
+    //         },
+    //     });
+    // }
 </script>
 
 <script>

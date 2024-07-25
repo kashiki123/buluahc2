@@ -3,11 +3,11 @@
 include_once ('../../config.php');
 
 
-$sql = "SELECT *, fp_information.id as id, CONCAT(patients.last_name,',',patients.first_name) AS full_name, nurses.first_name as first_name2, nurses.last_name as last_name2, fp_obstetrical_history.fp_information_id as fp_information_id
+$sql = "SELECT *, fp_information.id as id, CONCAT(patients.last_name,', ',patients.first_name) AS full_name, patients.address as address1 ,nurses.first_name as first_name2, nurses.last_name as last_name2, fp_obstetrical_history.fp_information_id as fp_information_id
 FROM fp_information
 JOIN patients ON fp_information.patient_id = patients.id
 JOIN fp_obstetrical_history ON fp_information.id = fp_obstetrical_history.fp_information_id
-JOIN fp_consultation ON fp_consultation.fp_information_id = fp_information.id
+JOIN fp_consultation ON fp_information.id = fp_consultation.id
 JOIN nurses ON fp_information.nurse_id = nurses.id WHERE fp_information.is_deleted = 0";
 
 
@@ -35,11 +35,11 @@ if ($result === false) {
         </button>
     </a>
 
-    <a href="history_consultation.php">
+    <!-- <a href="history_consultation.php">
         <button type="button" id="openModalButton" class="btn btn-warning ml-1">
             View History
         </button>
-    </a>
+    </a> -->
     <br><br>
 
 
@@ -62,13 +62,14 @@ if ($result === false) {
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="patient">Select Patient</label>
+                                    <label for="patient">Select Patient</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input list="patients" class="form-control" name="patient_id" id="patient_id"
                                         required>
                                     <datalist id="patients">
                                         <?php
                                         // Query to fetch patients from the database
-                                        $sql2 = "SELECT serial_no, first_name, last_name FROM patients ORDER BY id DESC";
+                                        $sql2 = "SELECT serial_no, first_name, last_name, age FROM patients ORDER BY id DESC";
                                         $result2 = $conn->query($sql2);
 
                                         if ($result2->num_rows > 0) {
@@ -76,14 +77,24 @@ if ($result === false) {
                                                 $patientSerialNo = $row2['serial_no'];
                                                 $firstName = $row2['first_name'];
                                                 $lastName = $row2['last_name'];
+                                                $age = $row2['age'];
 
-                                                // Output an option element for each patient with the serial_no as the value
-                                                echo "<option value='$patientSerialNo'>$firstName $lastName</option>";
+                                                // // Calculate age
+                                                // $birthDate = new DateTime($dateOfBirth);
+                                                // $currentDate = new DateTime();
+                                                // $age = $currentDate->diff($birthDate)->y;
+                                        
+                                                // Only add patient to the options if they are 14 or older
+                                                if ($age >= 18) {
+                                                    // Output an option element for each patient with the serial_no as the value
+                                                    echo "<option value='$patientSerialNo'>$firstName $lastName</option>";
+                                                }
                                             }
                                         } else {
                                             echo "<option disabled>No patients found</option>";
                                         }
                                         ?>
+
                                     </datalist>
                                     <input type="hidden" name="serial_no2" id="serial_no2">
 
@@ -107,7 +118,8 @@ if ($result === false) {
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Select Nurse</label>
+                                    <label for="">Select Nurse</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <select class="form-control" name="nurse_id" id="nurse_id" required>
                                         <option value="" disabled selected hidden>Select A Nurse</option>
                                         <?php
@@ -138,8 +150,10 @@ if ($result === false) {
                                 </div>
 
 
+
                             </div>
-                            <div class="col-4">
+
+                            <div class="col-4 tago">
                                 <div class="form-group">
                                     <label for="">Select Status</label>
                                     <select class="form-control" name="status" id="status" required>
@@ -152,6 +166,24 @@ if ($result === false) {
                                 </div>
                             </div>
 
+                            <div class="form-group tago">
+                                <label for="">Select Step</label>
+                                <select class="form-control" name="step" id="step" required class="">
+                                    <option value="" disabled selected hidden>Select a Step</option>
+                                    <option value="Interview Staff">Interview Staff</option>
+                                    <option value="Consultation">Consultation</option>
+                                    <option value="Immunization">Immunization</option>
+                                    <option value="Prenatal">Prenatal</option>
+                                    <option value="Family Planning">Family Planning</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Nurse">Nurse</option>
+                                    <option value="Midwife">Midwife</option>
+                                    <option value="Head Nurse">Head Nurse</option>
+                                    <option value="Prescription">Prescription</option>
+                                </select>
+                                <!-- <div id="editStatus_error" class="error"></div> -->
+                            </div>
+
                         </div>
 
 
@@ -159,7 +191,8 @@ if ($result === false) {
 
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">No. of Living Children</label>
+                                    <label for="">No. of Living Children</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input type="text" class="form-control" id="no_of_children" name="no_of_children"
                                         required>
                                 </div>
@@ -167,14 +200,16 @@ if ($result === false) {
 
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Average Monthly Income</label>
+                                    <label for="">Average Monthly Income</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input type="number" class="form-control" id="income" name="income" required>
                                 </div>
                             </div>
 
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="plan_to_have_more_children">Plan to Have More Children?</label>
+                                    <label for="plan_to_have_more_children">Plan to Have More Children?</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <br>
                                     <div style="display: inline-block;" class="mt-1">
                                         <input type="radio" id="plan_to_have_more_children"
@@ -195,7 +230,8 @@ if ($result === false) {
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Type of Client</label>
+                                    <label for="">Type of Client</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <br>
                                     <div style="display: inline-block;" class="mt-1">
                                         <input type="radio" id="client_type" name="client_type" value="New Acceptor"
@@ -222,7 +258,8 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Reason for FP</label>
+                                    <label for="">Reason for FP</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <br>
                                     <div style="display: inline-block;" class="mt-1">
                                         <input type="radio" id="reason_for_fp" name="reason_for_fp" value="spacing"
@@ -365,20 +402,17 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col-4">
                                         <div class="form-group">
-                                            <label for="">Type of Last Delivery</label>
+                                            <label for="type_of_last_delivery">Type of Last Delivery</label>
                                             <br>
-                                            <div style="display: inline-block;" class="mt-1">
-                                                <input type="radio" id="type_of_last_delivery"
-                                                    name="type_of_last_delivery" value="Vaginal" class="radio-input"
-                                                    required>
-                                                <label for="" class="radio-label"
-                                                    style="margin-left: 5px;">Vaginal</label>
-                                            </div>
-                                            <div style="display: inline-block;">
-                                                <input type="radio" id="type_of_last_delivery"
-                                                    name="type_of_last_delivery" value="Cesarean Section"
-                                                    class="radio-input" required>
-                                                <label for="" class="radio-label">Cesarean Section</label>
+                                            <div class="mt-1">
+                                                <select id="type_of_last_delivery" name="type_of_last_delivery"
+                                                    class="form-control" required>
+                                                    <option value="" disabled selected>Select a Type of Last Delivery
+                                                    </option>
+                                                    <option value="None">None</option>
+                                                    <option value="Vaginal">Vaginal</option>
+                                                    <option value="Cesarean Section">Cesarean Section</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -388,24 +422,14 @@ if ($result === false) {
                                         <div class="form-group">
                                             <label for="">Menstrual Flow</label>
                                             <br>
-                                            <div style="display: inline-block;" class="mt-1">
-                                                <input type="radio" id="mens_type" name="mens_type" value="Scanty"
-                                                    class="radio-input" required>
-                                                <label for="" class="radio-label"
-                                                    style="margin-left: 5px;">Scanty</label>
-                                            </div>
-                                            <div style="display: inline-block;" class="mt-1">
-                                                <input type="radio" id="mens_type" name="mens_type" value="Moderate"
-                                                    class="radio-input" required>
-                                                <label for="" class="radio-label"
-                                                    style="margin-left: 5px;">Moderate</label>
-                                            </div>
-
-                                            <div style="display: inline-block;" class="mt-1">
-                                                <input type="radio" id="mens_type" name="mens_type" value="Heavy"
-                                                    class="radio-input" required>
-                                                <label for="" class="radio-label"
-                                                    style="margin-left: 5px;">Heavy</label>
+                                            <div class="mt-1">
+                                                <select id="mens_type" name="mens_type" class="form-control" required>
+                                                    <option value="" disabled selected>Select a Menstrual Flow</option>
+                                                    <option value="None">None</option>
+                                                    <option value="Scanty">Scanty</option>
+                                                    <option value="Moderate">Moderate</option>
+                                                    <option value="Heavy">Heavy</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -519,7 +543,8 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="weight">Weight</label>
+                                            <label for="weight">Weight</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <div class="input-group">
                                                 <input type="number" class="form-control" id="weight" name="weight"
                                                     required>
@@ -533,7 +558,8 @@ if ($result === false) {
 
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Blood Pressure</label>
+                                            <label for="">Blood Pressure</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <di class="input-group">
                                                 <input type="text" class="form-control" id="bp" name="bp" required>
                                                 <div class="input-group-append">
@@ -547,7 +573,8 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Height</label>
+                                            <label for="">Height</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <div class="input-group">
                                                 <input type="text" class="form-control" id="height" name="height"
                                                     required>
@@ -560,7 +587,8 @@ if ($result === false) {
 
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Pulse Rate</label>
+                                            <label for="">Pulse Rate</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <div class="input-group">
                                                 <input type="text" class="form-control" id="pulse" name="pulse"
                                                     required>
@@ -576,7 +604,8 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Skin</label>
+                                            <label for="">Skin</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="skin" name="skin" value="Normal"
@@ -608,7 +637,8 @@ if ($result === false) {
 
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Extremities</label>
+                                            <label for="">Extremities</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="extremities" name="extremities" value="Normal"
@@ -637,7 +667,8 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Conjunctiva</label>
+                                            <label for="">Conjunctiva</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="conjunctiva" name="conjunctiva" value="Normal"
@@ -662,7 +693,8 @@ if ($result === false) {
 
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Neck</label>
+                                            <label for="">Neck</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="neck" name="neck" value="Normal"
@@ -684,7 +716,8 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Breast</label>
+                                            <label for="">Breast</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="breast" name="breast" value="Normal"
@@ -709,7 +742,8 @@ if ($result === false) {
 
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Abdomen</label>
+                                            <label for="">Abdomen</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="abdomen" name="abdomen" value="Normal"
@@ -738,19 +772,6 @@ if ($result === false) {
 
                             </div>
                         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -819,6 +840,43 @@ if ($result === false) {
             </div>
         </div>
     </div>
+
+    <script>
+        // Add an event listener to the Save button
+        document.getElementById('addButton').addEventListener('click', function () {
+            // Assuming you have a variable `completedStep` that holds the completed step value, e.g., "Step1", "Step2", etc.
+            var completedStep = "Family Planning"; // Example completed step
+
+            // Get the select element
+            var selectStep = document.getElementById('step');
+
+            // Loop through options and set selected attribute if value matches completedStep
+            for (var i = 0; i < selectStep.options.length; i++) {
+                if (selectStep.options[i].value === completedStep) {
+                    selectStep.options[i].setAttribute('selected', 'selected');
+                    break; // Exit loop once selected option is found
+                }
+            }
+        });
+    </script>
+    <script>
+        // Add an event listener to the Save button
+        document.getElementById('addButton').addEventListener('click', function () {
+            // Assuming you have a variable `completedStep` that holds the completed step value, e.g., "Step1", "Step2", etc.
+            var completedStep = "Pending"; // Example completed step
+
+            // Get the select element
+            var selectStep = document.getElementById('status');
+
+            // Loop through options and set selected attribute if value matches completedStep
+            for (var i = 0; i < selectStep.options.length; i++) {
+                if (selectStep.options[i].value === completedStep) {
+                    selectStep.options[i].setAttribute('selected', 'selected');
+                    break; // Exit loop once selected option is found
+                }
+            }
+        });
+    </script>
     <style>
         .tago {
             display: none;
@@ -831,11 +889,13 @@ if ($result === false) {
                     <thead class="thead-light">
                         <tr>
                             <th class="tago">No.</th>
-                            <th>Serial No</th>
+                            <th>Family Number</th>
                             <th>Patient Name</th>
                             <th>Date Of Last Delivery</th>
-                            <th>Check up Today</th>
+                            <th>Check up Date</th>
+                            <th>Gender</th>
                             <th>Status</th>
+                            <th>Progress</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -861,7 +921,13 @@ if ($result === false) {
                                         <?php echo $row['checkup_date']; ?>
                                     </td>
                                     <td class="align-middle">
+                                        <?php echo $row['gender']; ?>
+                                    </td>
+                                    <td class="align-middle">
                                         <?php echo $row['status']; ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $row['steps']; ?>
                                     </td>
                                     <td class="align-middle">
                                         <button type="button" class="btn btn-success editbtn"
@@ -884,6 +950,9 @@ if ($result === false) {
                                 <td class="align-middle"></td>
                                 <td class="align-middle"></td>
                                 <td class="align-middle"></td>
+                                <td class="align-middle"></td>
+                                <td class="align-middle"></td>
+
 
 
                             </tr>
@@ -921,48 +990,89 @@ if ($result === false) {
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Select Nurse</label>
+                                    <label for="nurse_id2">Select Nurse</label>
                                     <select class="form-control" name="nurse_id2" id="nurse_id2" required>
                                         <option value="" disabled selected hidden>Select A Nurse</option>
                                         <?php
-
-                                        // Query to fetch patients from the database
-                                        $sql2 = "SELECT id, first_name, last_name FROM nurses
-                                WHERE is_active = 0 ORDER BY id DESC";
+                                        // Query to fetch nurses from the database
+                                        $sql2 = "SELECT id, first_name, last_name FROM nurses WHERE is_active = 0 ORDER BY id DESC";
                                         $result2 = $conn->query($sql2);
 
                                         if ($result2->num_rows > 0) {
                                             while ($row2 = $result2->fetch_assoc()) {
-                                                $patientId = $row2['id'];
+                                                $nurseId = $row2['id'];
                                                 $firstName = $row2['first_name'];
                                                 $lastName = $row2['last_name'];
 
-                                                // Output an option element for each patient
-                                                echo "<option value='$patientId'>$firstName $lastName</option>";
+                                                // Output an option element for each nurse
+                                                echo "<option value='$nurseId'>$firstName $lastName</option>";
                                             }
                                         } else {
-                                            echo "<option disabled>No patients found</option>";
+                                            echo "<option disabled>No nurses found</option>";
                                         }
-
-                                        // Close the database connection
-                                        
                                         ?>
                                     </select>
-
                                 </div>
-
-
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Status</label>
+                                    <label for="editstatus">Status</label>
                                     <select class="form-control" name="status" id="editstatus" required>
                                         <option value="" disabled selected hidden>Select a Status</option>
                                         <option value="Complete">Complete</option>
                                         <option value="Pending">Pending</option>
                                         <option value="Progress">Progress</option>
                                     </select>
-                                    <!-- <div id="editStatus_error" class="error"></div> -->
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="patient_name">Patient Name</label>
+                                    <input list="patients" class="form-control" name="patient_name" id="patient_name"
+                                        disabled required>
+                                    <datalist id="patients">
+                                        <?php
+                                        // Query to fetch patients from the database
+                                        $sql2 = "SELECT serial_no, first_name, last_name, age FROM patients ORDER BY id DESC";
+                                        $result2 = $conn->query($sql2);
+
+                                        if ($result2->num_rows > 0) {
+                                            while ($row2 = $result2->fetch_assoc()) {
+                                                $patientSerialNo = $row2['serial_no'];
+                                                $firstName = $row2['first_name'];
+                                                $lastName = $row2['last_name'];
+                                                $age = $row2['age'];
+
+                                                // Only add patient to the options if they are 18 or older
+                                                if ($age >= 18) {
+                                                    // Output an option element for each patient with the serial_no as the value
+                                                    echo "<option value='$patientSerialNo'>$firstName $lastName</option>";
+                                                }
+                                            }
+                                        } else {
+                                            echo "<option disabled>No patients found</option>";
+                                        }
+                                        ?>
+                                    </datalist>
+                                    <input type="hidden" name="patient_id" id="patient_id" required>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="step2">Select Step</label>
+                                    <select class="form-control" name="step2" id="step2" required>
+                                        <option value="" disabled selected hidden>Select a Step</option>
+                                        <option value="Interview Staff">Interview Staff</option>
+                                        <option value="Consultation">Consultation</option>
+                                        <option value="Immunization">Immunization</option>
+                                        <option value="Prenatal">Prenatal</option>
+                                        <option value="Family Planning">Family Planning</option>
+                                        <option value="Doctor">Doctor</option>
+                                        <option value="Nurse">Nurse</option>
+                                        <option value="Midwife">Midwife</option>
+                                        <option value="Head Nurse">Head Nurse</option>
+                                        <option value="Prescription">Prescription</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -1184,16 +1294,14 @@ if ($result === false) {
                                         <div class="form-group">
                                             <label for="">Type of Last Delivery</label>
                                             <br>
-                                            <div style="display: inline-block;" class="mt-1">
-                                                <input type="radio" id="vaginalRadio" name="type_of_last_delivery2"
-                                                    value="Vaginal" class="radio-input" required>
-                                                <label for="vaginalRadio" class="radio-label"
-                                                    style="margin-left: 5px;">Vaginal</label>
-                                            </div>
-                                            <div style="display: inline-block;">
-                                                <input type="radio" id="cesareanRadio" name="type_of_last_delivery2"
-                                                    value="Cesarean Section" class="radio-input" required>
-                                                <label for="cesareanRadio" class="radio-label">Cesarean Section</label>
+                                            <div class="mt-1">
+                                                <select id="type_of_last_delivery2" name="type_of_last_delivery2"
+                                                    class="form-control" required>
+                                                    <option value="" disabled selected>Select one</option>
+                                                    <option value="None">None</option>
+                                                    <option value="Vaginal">Vaginal</option>
+                                                    <option value="Cesarean Section">Cesarean Section</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -1202,86 +1310,78 @@ if ($result === false) {
                                     <div class="col-4">
                                         <label for="">Menstrual Flow</label>
                                         <br>
-                                        <div style="display: inline-block;" class="mt-1">
-                                            <input type="radio" id="scantyRadio" name="mens_type2" value="Scanty"
-                                                class="radio-input" required>
-                                            <label for="scantyRadio" class="radio-label"
-                                                style="margin-left: 5px;">Scanty</label>
-                                        </div>
-                                        <div style="display: inline-block;" class="mt-1">
-                                            <input type="radio" id="moderateRadio" name="mens_type2" value="Moderate"
-                                                class="radio-input" required>
-                                            <label for="moderateRadio" class="radio-label"
-                                                style="margin-left: 5px;">Moderate</label>
-                                        </div>
-
-                                        <div style="display: inline-block;" class="mt-1">
-                                            <input type="radio" id="heavyRadio" name="mens_type2" value="Heavy"
-                                                class="radio-input" required>
-                                            <label for="heavyRadio" class="radio-label"
-                                                style="margin-left: 5px;">Heavy</label>
+                                        <div class="mt-1">
+                                            <select id="mens_type2" name="mens_type2" class="form-control" required>
+                                                <option value="" disabled selected>Select a Menstrual Flow</option>
+                                                <option value="None">None</option>
+                                                <option value="Scanty">Scanty</option>
+                                                <option value="Moderate">Moderate</option>
+                                                <option value="Heavy">Heavy</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
 
                             </div>
                             <hr>
-                            <h5>IV RISK FOR SEXUALITY TRANSMITTED INFECTIONS</h5>
-                            <hr>
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label for="medical_conditions">Does the client have any of the
-                                            following?</label>
-                                        <br>
-                                        <div class="checkbox-list">
-                                            <div class="checkbox-item">
-                                                <input type="checkbox" id="abnormal_discharge2"
-                                                    name="abnormal_discharge2" value="abnormal_discharge">
-                                                <label class="checkbox-label">abnormal discharge from the genital
-                                                    area</label>
-                                            </div>
-                                            <div class="checkbox-item">
-                                                <input type="checkbox" id="genital_sores_ulcers2"
-                                                    name="genital_sores_ulcers2" value="genital_sores_ulcers">
-                                                <label class="checkbox-label">sores or ulcers in the genital
-                                                    area</label>
-                                            </div>
-                                            <div class="checkbox-item">
-                                                <input type="checkbox" id="genital_pain_burning_sensation2"
-                                                    name="genital_pain_burning_sensation2"
-                                                    value="genital_pain_burning_sensation">
-                                                <label class="checkbox-label">pain or burning sensation in the genital
-                                                    area</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-group">
-
-                                        <br>
-                                        <div class="checkbox-list">
-                                            <div class="checkbox-item">
-                                                <input type="checkbox" id="treatment_for_sti2" name="treatment_for_sti2"
-                                                    value="treatment_for_sti">
-                                                <label class="checkbox-label">history of treatment for sexually
-                                                    transmitted infections</label>
-                                            </div>
-                                            <div class="checkbox-item">
-                                                <input type="checkbox" id="hiv_aids_pid2" name="hiv_aids_pid2"
-                                                    value="hiv_aids_pid">
-                                                <label class="checkbox-label">HIV/AIDS/Pelvic inflammatory
-                                                    disease</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
 
 
                         </div>
+
+                        <h5>IV RISK FOR SEXUALITY TRANSMITTED INFECTIONS</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="medical_conditions">Does the client have any of the
+                                        following?</label>
+                                    <br>
+                                    <div class="checkbox-list">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="abnormal_discharge2" name="abnormal_discharge2"
+                                                value="abnormal_discharge">
+                                            <label class="checkbox-label">abnormal discharge from the genital
+                                                area</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="genital_sores_ulcers2"
+                                                name="genital_sores_ulcers2" value="genital_sores_ulcers">
+                                            <label class="checkbox-label">sores or ulcers in the genital
+                                                area</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="genital_pain_burning_sensation2"
+                                                name="genital_pain_burning_sensation2"
+                                                value="genital_pain_burning_sensation">
+                                            <label class="checkbox-label">pain or burning sensation in the genital
+                                                area</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+
+                                    <br>
+                                    <div class="checkbox-list">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="treatment_for_sti2" name="treatment_for_sti2"
+                                                value="treatment_for_sti">
+                                            <label class="checkbox-label">history of treatment for sexually
+                                                transmitted infections</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="hiv_aids_pid2" name="hiv_aids_pid2"
+                                                value="hiv_aids_pid">
+                                            <label class="checkbox-label">HIV/AIDS/Pelvic inflammatory
+                                                disease</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
 
                         <!-- other col -->
                         <div class="col-12">
@@ -1354,9 +1454,11 @@ if ($result === false) {
                                     <div class="form-group">
                                         <label for="">Height</label>
                                         <input type="text" class="form-control" id="height2" name="height2" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">cm</span>
+                                        </div>
                                     </div>
                                 </div>
-
                                 <div class="col">
                                     <div class="form-group">
                                         <label for="">Pulse Rate</label>
@@ -1561,41 +1663,97 @@ if ($result === false) {
 
         <?php if ($result->num_rows > 0): ?>
             var table = $('#tablebod').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id', visible: false },
-                    { targets: 1, data: 'serial_no' },
-                    { targets: 2, data: 'full_name' },
-                    { targets: 3, data: 'date_of_last_delivery' },
-                    { targets: 4, data: 'checkup_date' },
-                    { targets: 5, data: 'status' },
-                    {
-                        targets: 6,
-                        searchable: false,
-                        data: null,
-                        render: function (data, type, row) {
-                            var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
-                            var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="fas fa-user-times"></i> Inactive</button>';
-                            return editButton + ' ' + deleteButton;
-                        }
-                    } // Action column
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id',
+                    visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'serial_no'
+                },
+                {
+                    targets: 2,
+                    data: 'full_name'
+                },
+                {
+                    targets: 3,
+                    data: 'date_of_last_delivery'
+                },
+                {
+                    targets: 4,
+                    data: 'checkup_date'
+                },
+                {
+                    targets: 5,
+                    data: 'gender'
+                },
+                {
+                    targets: 6,
+                    data: 'status'
+                },
+                {
+                    targets: 7,
+                    data: 'steps'
+                },
+                {
+                    targets: 8,
+                    searchable: false,
+                    data: null,
+                    render: function (data, type, row) {
+                        var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
+                        var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="fas fa-user-times"></i> Inactive</button>';
+                        return editButton + ' ' + deleteButton;
+                    }
+                } // Action column
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
 
         <?php else: ?>
             // Initialize DataTable without the "Action" column when no rows are found
             var table = $('#tablebod').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id', visible: false },
-                    { targets: 1, data: 'seria_no' },
-                    { targets: 2, data: 'full_name' },
-                    { targets: 3, data: 'date_of_last_delivery' },
-                    { targets: 4, data: 'checkup_date' },
-                    { targets: 5, data: 'status' },
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id',
+                    visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'seria_no'
+                },
+                {
+                    targets: 2,
+                    data: 'full_name'
+                },
+                {
+                    targets: 3,
+                    data: 'date_of_last_delivery'
+                },
+                {
+                    targets: 4,
+                    data: 'checkup_date'
+                },
+                {
+                    targets: 5,
+                    data: 'gender'
+                },
+                {
+                    targets: 6,
+                    data: 'status'
+                },
+                {
+                    targets: 7,
+                    data: 'steps'
+                },
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
         <?php endif; ?>
 
@@ -1604,26 +1762,54 @@ if ($result === false) {
 
             table.destroy(); // Destroy the existing DataTable
             table = $('#tablebod').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id', visible: false },
-                    { targets: 1, data: 'serial_no' },
-                    { targets: 2, data: 'full_name' },
-                    { targets: 3, data: 'date_of_last_delivery' },
-                    { targets: 4, data: 'checkup_date' },
-                    { targets: 5, data: 'status' },
-                    {
-                        targets: 6,
-                        searchable: false,
-                        data: null,
-                        render: function (data, type, row) {
-                            var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
-                            var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="fas fa-user-times"></i> Inactive</button>';
-                            return editButton + ' ' + deleteButton;
-                        }
-                    } // Action column
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id',
+                    visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'serial_no'
+                },
+                {
+                    targets: 2,
+                    data: 'full_name'
+                },
+                {
+                    targets: 3,
+                    data: 'date_of_last_delivery'
+                },
+                {
+                    targets: 4,
+                    data: 'checkup_date'
+                },
+                {
+                    targets: 5,
+                    data: 'gender'
+                },
+                {
+                    targets: 6,
+                    data: 'status'
+                },
+                {
+                    targets: 7,
+                    data: 'steps'
+                },
+                {
+                    targets: 8,
+                    searchable: false,
+                    data: null,
+                    render: function (data, type, row) {
+                        var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
+                        var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="fas fa-user-times"></i> Inactive</button>';
+                        return editButton + ' ' + deleteButton;
+                    }
+                } // Action column
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
 
 
@@ -1634,6 +1820,7 @@ if ($result === false) {
             var nurse_id = $('#nurse_id').val();
             var serial = $('#serial').val();
             var status = $('#status').val();
+            var steps = $('#step').val();
             var method = $('#method').val();
             var no_of_children = $('#no_of_children').val();
             var income = $('#income').val();
@@ -1711,6 +1898,7 @@ if ($result === false) {
                     serial: serial,
                     method: method,
                     status: status,
+                    steps: steps,
                     no_of_children: no_of_children,
                     income: income,
                     plan_to_have_more_children: plan_to_have_more_children,
@@ -1752,6 +1940,7 @@ if ($result === false) {
                         $('#serial').val('');
                         $('#method').val('');
                         $('#status').val('');
+                        $('#step').val('');
                         $('#no_of_children').val('');
                         $('#income').val('');
                         $('#plan_to_have_more_children').val('');
@@ -1846,7 +2035,9 @@ if ($result === false) {
                     $.ajax({
                         url: 'action/delete_family.php',
                         method: 'POST',
-                        data: { primary_id: deletedataId },
+                        data: {
+                            primary_id: deletedataId
+                        },
                         success: function (response) {
                             if (response === 'Success') {
 
@@ -1873,7 +2064,9 @@ if ($result === false) {
             $.ajax({
                 url: 'action/get_family_by_id.php', // 
                 method: 'POST',
-                data: { primary_id: editId },
+                data: {
+                    primary_id: editId
+                },
                 success: function (data) {
 
                     var editGetData = data;
@@ -1881,12 +2074,16 @@ if ($result === false) {
                     console.log(editGetData);
                     $('#editModal #editdataId').val(editGetData.id);
                     $('#editModal #editstatus').val(editGetData.status);
+                    $('#editModal #step2').val(editGetData.steps);
                     $('#editModal #no_of_children2').val(editGetData.no_of_children);
                     $('#editModal #income2').val(editGetData.income);
+                    $('#editModal #patient_name').val(editGetData.full_name);
                     $('#editModal #nurse_id2').val(editGetData.nurse_id);
                     $('#editModal #no_of_pregnancies2').val(editGetData.no_of_pregnancies);
                     $('#editModal #date_of_last_delivery2').val(editGetData.date_of_last_delivery);
                     $('#editModal #last_period2').val(editGetData.last_period);
+                    $('#editModal #type_of_last_delivery2').val(editGetData.type_of_last_delivery);
+                    $('#editModal #mens_type2').val(editGetData.mens_type);
 
 
                     // Assuming editGetData.plan_to_have_more_children contains the value "Yes" or "No"
@@ -1987,21 +2184,13 @@ if ($result === false) {
                         $('#with_disability2').prop('checked', false);
                     }
 
-                    // Check the appropriate radio button based on the value
-                    if (editGetData.type_of_last_delivery === "Vaginal") {
-                        $('#vaginalRadio').prop('checked', true);
-                    } else if (editGetData.type_of_last_delivery === "Cesarean Section") {
-                        $('#cesareanRadio').prop('checked', true);
-                    }
-
-
-                    if (editGetData.mens_type === "Scanty") {
-                        $('#scantyRadio').prop('checked', true);
-                    } else if (editGetData.mens_type === "Moderate") {
-                        $('#moderateRadio').prop('checked', true);
-                    } else if (editGetData.mens_type === "Heavy") {
-                        $('#heavyRadio').prop('checked', true);
-                    }
+                    // if (editGetData.mens_type === "Scanty") {
+                    //     $('#scantyRadio').prop('checked', true);
+                    // } else if (editGetData.mens_type === "Moderate") {
+                    //     $('#moderateRadio').prop('checked', true);
+                    // } else if (editGetData.mens_type === "Heavy") {
+                    //     $('#heavyRadio').prop('checked', true);
+                    // }
 
                     if (editGetData.abnormal_discharge === 'Yes') {
                         $('#abnormal_discharge2').prop('checked', true);
@@ -2152,9 +2341,11 @@ if ($result === false) {
 
             var abnormal_discharge = $('#abnormal_discharge2').val();
             var nurse_id = $('#nurse_id2').val();
+            var patient_id = $('patient_name').val();
             var serial = $('#serial2').val();
             var method = $('#method2').val();
             var status = $('#editstatus').val();
+            var steps = $('#step2').val();
             var no_of_children = $('#no_of_children2').val();
             var income = $('#income2').val();
 
@@ -2162,8 +2353,8 @@ if ($result === false) {
             var plan_to_have_more_children = $("input[name='plan_to_have_more_children2']:checked").val();
             var client_type = $("input[name='client_type2']:checked").val();
             var reason_for_fp = $("input[name='reason_for_fp2']:checked").val();
-            var type_of_last_delivery = $("input[name='type_of_last_delivery2']:checked").val();
-            var mens_type = $("input[name='mens_type2']:checked").val();
+            var type_of_last_delivery = $('#type_of_last_delivery2').val();
+            var mens_type = $('#mens_type2').val();
             var skin = $("input[name='skin2']:checked").val();
 
 
@@ -2209,9 +2400,11 @@ if ($result === false) {
                     abnormal_discharge: abnormal_discharge,
                     primary_id: editId,
                     nurse_id: nurse_id,
+                    patient_id: patient_id,
                     serial: serial,
                     method: method,
                     status: status,
+                    steps: steps,
                     no_of_children: no_of_children,
                     income: income,
                     plan_to_have_more_children: plan_to_have_more_children,
@@ -2282,8 +2475,6 @@ if ($result === false) {
 
 
     });
-
-
 </script>
 
 <script>

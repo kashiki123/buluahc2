@@ -3,10 +3,9 @@
 include_once ('../../config.php');
 
 
-$sql = "SELECT *,prenatal_subjective.id as id,patients.first_name as first_name,patients.last_name as last_name,patients.serial_no as serial_no
+$sql = "SELECT *,prenatal_subjective.id as id,CONCAT(patients.last_name, ' , ', patients.first_name) AS full_name,patients.serial_no as serial_no
 FROM prenatal_subjective
 JOIN patients ON prenatal_subjective.patient_id = patients.id WHERE prenatal_subjective.is_deleted = 0";
-
 
 $result = $conn->query($sql);
 
@@ -26,11 +25,11 @@ if ($result === false) {
             View Archive
         </button>
     </a>
-    <a href="history_consultation.php">
+    <!-- <a href="history_consultation.php">
         <button type="button" id="openModalButton" class="btn btn-warning ml-1">
             View History
         </button>
-    </a>
+    </a> -->
 
     <br><br>
 
@@ -54,13 +53,14 @@ if ($result === false) {
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="patient">Select Patient</label>
+                                    <label for="patient">Select Patient</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input list="patients" class="form-control" name="patient_id" id="patient_id"
                                         required>
                                     <datalist id="patients">
                                         <?php
                                         // Query to fetch patients from the database
-                                        $sql2 = "SELECT serial_no, first_name, last_name FROM patients WHERE gender = 'Female' ORDER BY id DESC";
+                                        $sql2 = "SELECT serial_no, first_name, last_name FROM patients WHERE gender = 'Female' AND age >= 10 AND age < 50 ORDER BY id DESC";
                                         $result2 = $conn->query($sql2);
 
                                         if ($result2->num_rows > 0) {
@@ -98,7 +98,8 @@ if ($result === false) {
 
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Select Midwife</label>
+                                    <label for="">Select Midwife</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <select class="form-control" name="nurse_id" id="nurse_id" required>
                                         <option value="" disabled selected hidden>Select a Midwife</option>
                                         <?php
@@ -132,17 +133,56 @@ if ($result === false) {
 
                             </div>
                             <div class="col-4">
+                                <div class="form-group ">
+                                    <label for="">Select Progress</label>
+                                    <span style="color: red; font-size: 22px;">*</span>
+                                    <select class="form-control" name="step" id="step" required class="">
+                                        <option value="" disabled selected hidden>Select a Progress</option>
+                                        <option value="Prenatal">Prenatal</option>
+                                        <option value="Abortion">Abortion</option>
+                                        <option value="Not Pregnant">Not Pregnant</option>
+                                        <option value="Nurse">Nurse</option>
+                                        <option value="Midwife">Midwife</option>
+
+                                    </select>
+                                    <!-- <div id="editStatus_error" class="error"></div> -->
+                                </div>
+                            </div>
+
+                            <div class="col-4 tago">
                                 <div class="form-group">
                                     <label for="">Select Status</label>
                                     <select class="form-control" name="status" id="status" required>
                                         <option value="" disabled selected hidden>Select a Status</option>
                                         <!-- <option value="Complete">Complete</option> -->
                                         <option value="Pending">Pending</option>
-                                        <option value="Progress">Progress</option>
+                                        <option value="In Progress">Progress</option>
                                     </select>
                                     <!-- <div id="editStatus_error" class="error"></div> -->
                                 </div>
                             </div>
+                            <style>
+                                .otag {
+                                    display: none;
+                                }
+                            </style>
+                            <!-- <div class="form-group otag">
+                                <label for="">Select Step</label> -->
+                            <!-- <select class="form-control" name="step" id="step" required class="">
+                                    <option value="" disabled selected hidden>Select a Step</option>
+                                    <option value="Interview Staff">Interview Staff</option>
+                                    <option value="Consultation">Consultation</option>
+                                    <option value="Immunization">Immunization</option>
+                                    <option value="Prenatal">Prenatal</option>
+                                    <option value="Family Planning">Family Planning</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Nurse">Nurse</option>
+                                    <option value="Midwife">Midwife</option>
+                                    <option value="Head Nurse">Head Nurse</option>
+                                    <option value="Prescription">Prescription</option>
+                                </select> -->
+                            <!-- <div id="editStatus_error" class="error"></div> -->
+                            <!-- </div> -->
                         </div>
 
 
@@ -153,7 +193,8 @@ if ($result === false) {
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="height">Height</label>
+                                    <label for="height">Height</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="height" name="height" required>
                                         <div class="input-group-append">
@@ -165,7 +206,8 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="weight">Weight</label>
+                                    <label for="weight">Weight</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="weight" name="weight" required>
                                         <div class="input-group-append">
@@ -177,26 +219,30 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="temperature">Temperature</label>
+                                    <label for="temperature">Temperature</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="temperature" name="temperature"
-                                            required>
+                                        <input type="number" class="form-control" id="temperature" name="temperature"
+                                            required min="37.3" max="41.0" step="0.1" oninput="checkTemperature()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">°C</span>
                                         </div>
                                     </div>
+                                    <div id="temperature-feedback" class="feedback"></div>
                                 </div>
                             </div>
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="pr">PR</label>
+                                    <label for="pr">PR</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="pr" name="pr" required>
+                                        <input type="number" class="form-control" id="pr" name="pr" required min="30"
+                                            max="200" step="1" oninput="checkPR()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">bpm</span>
                                         </div>
                                     </div>
+                                    <div id="pr-feedback" class="feedback"></div>
                                 </div>
                             </div>
 
@@ -206,7 +252,7 @@ if ($result === false) {
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="rr">RR</label>
+                                    <label for="rr">RR</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="rr" name="rr" required>
                                         <div class="input-group-append">
@@ -218,19 +264,22 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="bp">BP</label>
+                                    <label for="bp">BP</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="bp" name="bp" required>
+                                        <input type="text" class="form-control" id="bp" name="bp" required
+                                            oninput="checkBP()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">mmHg</span>
                                         </div>
                                     </div>
+                                    <div id="bp-feedback" class="feedback"></div>
                                 </div>
                             </div>
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="menarche">Menarche</label>
+                                    <label for="menarche">Menarche</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="menarche" name="menarche" required>
                                         <div class="input-group-append">
@@ -239,8 +288,19 @@ if ($result === false) {
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col">
+                                <div class="form-group">
+                                    <label for="lmp">LMP</label><span style="color: red; font-size: 22px;">*</span>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" id="lmp" name="lmp" required
+                                            onchange="calculateAOGandEDC()">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">date</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="col">
                                 <div class="form-group">
                                     <label for="lmp">LMP</label>
                                     <div class="input-group">
@@ -250,19 +310,13 @@ if ($result === false) {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-
+                            </div> -->
                         </div>
-
-
-
-
-
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="gravida">Gravida</label>
+                                    <label for="gravida">Gravida</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="gravida" name="gravida" required>
                                         <div class="input-group-append">
@@ -274,7 +328,7 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="para">Para</label>
+                                    <label for="para">Para</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="para" name="para" required>
                                         <div class="input-group-append">
@@ -286,7 +340,8 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="fullterm">Fullterm</label>
+                                    <label for="fullterm">Fullterm</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="fullterm" name="fullterm" required>
                                         <div class="input-group-append">
@@ -298,7 +353,8 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="preterm">Preterm</label>
+                                    <label for="preterm">Preterm</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="preterm" name="preterm" required>
                                         <div class="input-group-append">
@@ -315,7 +371,8 @@ if ($result === false) {
                         <div class="row">
                             <div class="col-3">
                                 <div class="form-group">
-                                    <label for="abortion">Abortion</label>
+                                    <label for="abortion">Abortion</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="abortion" name="abortion" required>
                                         <div class="input-group-append">
@@ -327,7 +384,8 @@ if ($result === false) {
 
                             <div class="col-3">
                                 <div class="form-group">
-                                    <label for="stillbirth">Stillbirth</label>
+                                    <label for="stillbirth">Stillbirth</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="stillbirth" name="stillbirth"
                                             required>
@@ -340,7 +398,7 @@ if ($result === false) {
 
                             <div class="col-3">
                                 <div class="form-group">
-                                    <label for="alive">Alive</label>
+                                    <label for="alive">Alive</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="alive" name="alive" required>
                                         <div class="input-group-append">
@@ -361,19 +419,22 @@ if ($result === false) {
 
                             <div class="col-3">
                                 <div class="form-group">
-                                    <label for="hgb">HGB</label>
+                                    <label for="hgb">HGB (+/-)</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="hgb" name="hgb" required>
+                                        <input type="text" class="form-control" id="hgb" name="hgb" required
+                                            oninput="checkHgbValue()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">g/dL</span>
                                         </div>
                                     </div>
+                                    <span id="hgb-feedback"></span>
                                 </div>
                             </div>
 
                             <div class="col-3">
                                 <div class="form-group">
-                                    <label for="ua">U/A</label>
+                                    <label for="ua">U/A</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="ua" name="ua" required>
                                         <div class="input-group-append">
@@ -385,11 +446,24 @@ if ($result === false) {
 
                             <div class="col-3">
                                 <div class="form-group">
-                                    <label for="vdrl">VDRL/RPR</label>
+                                    <label for="vdrl">VDRL/RPR</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="vdrl" name="vdrl" required>
                                         <div class="input-group-append">
-                                            <span class="input-group-text">units/mL</span>
+                                            <span class="input-group-text">tither</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="hbsag">HBsAG</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="hbsag" name="hbsag" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">IU/mL</span>
                                         </div>
                                     </div>
                                 </div>
@@ -400,8 +474,39 @@ if ($result === false) {
                             </div>
 
                         </div>
-
-
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="rbs_fbs">RBS/FBS</label>
+                                    <span style="color: red; font-size: 22px;">*</span>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="rbsfbs" name="rbs_fbs" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">mg/dL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="blood_type">Blood Type</label><span
+                                        style="color: red; font-size: 22px;">*</span>
+                                    <div class="input-group">
+                                        <select class="form-control" id="blood_type" name="blood_type" required>
+                                            <option value="" disabled selected hidden>Select your Blood Type</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A-">A-</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B-">B-</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="AB-">AB-</option>
+                                            <option value="O+">O+</option>
+                                            <option value="O-">O-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col">
                                 <label for="medical_conditions">Does the client have any of the following?</label>
@@ -495,9 +600,9 @@ if ($result === false) {
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="edc">EDC</label>
+                                    <label for="edc">EDC</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="edc" name="edc" required>
+                                        <input type="text" class="form-control" id="edc" name="edc" required readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">date</span>
                                         </div>
@@ -507,9 +612,9 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="aog">AOG</label>
+                                    <label for="aog">AOG</label><span style="color: red; font-size: 22px;">*</span>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="aog" name="aog" required>
+                                        <input type="text" class="form-control" id="aog" name="aog" required readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">weeks</span>
                                         </div>
@@ -520,7 +625,8 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Date of Last Delivery</label>
+                                    <label for="">Date of Last Delivery</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input type="date" class="form-control" id="date_of_last_delivery"
                                         name="date_of_last_delivery" required>
                                 </div>
@@ -528,7 +634,8 @@ if ($result === false) {
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Place of Last Delivery</label>
+                                    <label for="">Place of Last Delivery</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input type="text" class="form-control" id="place_of_last_delivery"
                                         name="place_of_last_delivery" required>
                                 </div>
@@ -540,31 +647,31 @@ if ($result === false) {
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">TT1</label>
+                                    <label for="">TT1</label><span style="font-size: 15px;">(# of doses)</span>
                                     <input type="text" class="form-control" id="tt1" name="tt1" required>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">TT2</label>
+                                    <label for="">TT2</label><span style="font-size: 15px;">(# of doses)</span>
                                     <input type="text" class="form-control" id="tt2" name="tt2" required>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">TT3</label>
+                                    <label for="">TT3</label><span style="font-size: 15px;">(# of doses)</span>
                                     <input type="text" class="form-control" id="tt3" name="tt3" required>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">TT4</label>
+                                    <label for="">TT4</label><span style="font-size: 15px;">(# of doses)</span>
                                     <input type="text" class="form-control" id="tt4" name="tt4" required>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">TT5</label>
+                                    <label for="">TT5</label><span style="font-size: 15px;">(# of doses)</span>
                                     <input type="text" class="form-control" id="tt5" name="tt5" required>
                                 </div>
                             </div>
@@ -705,20 +812,8 @@ if ($result === false) {
                         </div>
 
 
-
-
-
-
-
-
                 </div>
-
-
-
-
-
                 </form>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"
                         id="closeModalButton">Close</button>
@@ -729,6 +824,172 @@ if ($result === false) {
     </div>
 </div>
 </div>
+<script>
+    function calculateAOGandEDC() {
+        const lmpInput = document.getElementById('lmp').value;
+        const lmpDate = new Date(lmpInput);
+        const currentDate = new Date();
+
+        if (lmpDate > currentDate) {
+            alert('LMP date cannot be in the future.');
+            return;
+        }
+
+        // Calculate AOG
+        const timeDifference = currentDate - lmpDate;
+        const daysDifference = timeDifference / (1000 * 3600 * 24);
+        const weeksDifference = Math.floor(daysDifference / 7);
+        document.getElementById('aog').value = weeksDifference;
+
+        // Calculate EDC
+        let edcDate = new Date(lmpDate);
+        edcDate.setMonth(edcDate.getMonth() - 3);
+        edcDate.setDate(edcDate.getDate() + 7);
+        edcDate.setFullYear(edcDate.getFullYear() + 1);
+
+        const edcDateString = edcDate.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+        document.getElementById('edc').value = edcDateString;
+    }
+</script>
+<script>
+    function checkTemperature() {
+        const tempInput = document.getElementById('temperature');
+        const feedback = document.getElementById('temperature-feedback');
+        const tempValue = parseFloat(tempInput.value);
+
+        // Clear feedback if the input is not a number
+        if (isNaN(tempValue)) {
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            return;
+        }
+
+        // Define the temperature ranges
+        if (tempValue < 37.3) {
+            feedback.textContent = 'Below normal';
+            feedback.className = 'feedback text-warning';
+        } else if (tempValue >= 37.3 && tempValue <= 38.0) {
+            feedback.textContent = 'Low-grade fever';
+            feedback.className = 'feedback text-success';
+        } else if (tempValue > 38.0 && tempValue <= 39.0) {
+            feedback.textContent = 'Moderate-grade fever';
+            feedback.className = 'feedback text-success';
+        } else if (tempValue > 39.0 && tempValue <= 41.0) {
+            feedback.textContent = 'High-grade fever';
+            feedback.className = 'feedback text-danger';
+        } else {
+            feedback.textContent = 'Above the normal range';
+            feedback.className = 'feedback text-danger';
+        }
+    }
+
+    function checkPR() {
+        const prInput = document.getElementById('pr');
+        const feedback = document.getElementById('pr-feedback');
+        const prValue = parseFloat(prInput.value);
+
+        // Clear feedback if the input is not a number
+        if (isNaN(prValue)) {
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            return;
+        }
+
+        // Define the pulse rate ranges
+        if (prValue < 60) {
+            feedback.textContent = 'Below normal';
+            feedback.className = 'feedback text-warning';
+        } else if (prValue >= 60 && prValue <= 100) {
+            feedback.textContent = 'Normal';
+            feedback.className = 'feedback text-success';
+        } else {
+            feedback.textContent = 'Above normal';
+            feedback.className = 'feedback text-danger';
+        }
+    }
+    function checkBP() {
+        const bpInput = document.getElementById('bp');
+        const feedback = document.getElementById('bp-feedback');
+        const bpValue = bpInput.value;
+        const [systolic, diastolic] = bpValue.split('/').map(Number);
+
+        // Clear feedback if the input is not a valid BP value
+        if (isNaN(systolic) || isNaN(diastolic)) {
+            feedback.textContent = 'Please enter a valid BP value (e.g., 120/80).';
+            feedback.className = 'feedback text-danger';
+            return;
+        }
+
+        // Define the BP ranges
+        if (systolic < 90 || diastolic < 60) {
+            feedback.textContent = 'Low blood pressure (hypotension)';
+            feedback.className = 'feedback text-warning';
+        } else if (systolic <= 120 && diastolic <= 80) {
+            feedback.textContent = 'Normal blood pressure';
+            feedback.className = 'feedback text-success';
+        } else if (systolic > 120 && systolic < 130 && diastolic < 80) {
+            feedback.textContent = 'Elevated blood pressure';
+            feedback.className = 'feedback text-warning';
+        } else if ((systolic >= 130 && systolic < 140) || (diastolic > 80 && diastolic < 90)) {
+            feedback.textContent = 'Hypertension stage 1';
+            feedback.className = 'feedback text-warning';
+        } else if (systolic >= 140 || diastolic >= 90) {
+            feedback.textContent = 'Hypertension stage 2';
+            feedback.className = 'feedback text-danger';
+        } else {
+            feedback.textContent = 'Please enter a valid BP value (e.g., 120/80).';
+            feedback.className = 'feedback text-danger';
+        }
+    }
+
+
+
+</script>
+<script>
+    function checkHgbValue() {
+        const hgbInput = document.getElementById('hgb');
+        const feedback = document.getElementById('hgb-feedback');
+        const hgbValue = parseFloat(hgbInput.value);
+
+        if (isNaN(hgbValue)) {
+            feedback.textContent = '';
+            feedback.className = '';
+            return;
+        }
+
+        if (hgbValue > 12) {
+            feedback.textContent = 'Negative';
+            feedback.className = 'text-danger';
+        } else if (hgbValue >= 10 && hgbValue <= 12) {
+            feedback.textContent = 'Positive';
+            feedback.className = 'text-success';
+        } else if (hgbValue < 10) {
+            feedback.textContent = 'Alarming / Referral';
+            feedback.className = 'text-warning';
+        } else {
+            feedback.textContent = '';
+            feedback.className = '';
+        }
+    }
+</script>
+<script>
+    // Add an event listener to the Save button
+    document.getElementById('addButton').addEventListener('click', function () {
+        // Assuming you have a variable `completedStep` that holds the completed step value, e.g., "Step1", "Step2", etc.
+        var completedStep = "Pending"; // Example completed step
+
+        // Get the select element
+        var selectStep = document.getElementById('status');
+
+        // Loop through options and set selected attribute if value matches completedStep
+        for (var i = 0; i < selectStep.options.length; i++) {
+            if (selectStep.options[i].value === completedStep) {
+                selectStep.options[i].setAttribute('selected', 'selected');
+                break; // Exit loop once selected option is found
+            }
+        }
+    });
+</script>
 <style>
     .tago {
         display: none;
@@ -741,10 +1002,11 @@ if ($result === false) {
                 <thead class="thead-light">
                     <tr>
                         <th class="tago">No.</th>
-                        <th>Serial No</th>
+                        <th>Family No</th>
                         <th>Patient Name</th>
                         <th>Checkup Date</th>
                         <th>Status</th>
+                        <th>Process</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -761,13 +1023,16 @@ if ($result === false) {
                                     <?php echo $row['serial_no']; ?>
                                 </td>
                                 <td class="align-middle">
-                                    <?php echo $row['last_name']; ?>
+                                    <?php echo $row['full_name']; ?>
                                 </td>
                                 <td class="align-middle">
                                     <?php echo $row['checkup_date']; ?>
                                 </td>
                                 <td class="align-middle">
                                     <?php echo $row['status']; ?>
+                                </td>
+                                <td class="align-middle">
+                                    <?php echo $row['steps']; ?>
                                 </td>
                                 <td class="align-middle">
                                     <button type="button" class="btn btn-success editbtn"
@@ -787,6 +1052,7 @@ if ($result === false) {
                             <td class="align-middle">No Prenatal Found</td>
                             <td class="align-middle">
                             <td>
+                            <td class="align-middle"></td>
                             <td class="align-middle"></td>
                             <td class="align-middle"></td>
                         </tr>
@@ -853,14 +1119,61 @@ if ($result === false) {
 
 
                         </div>
-                        <div class="col-4">
+                        <div class="col-sm">
                             <div class="form-group">
                                 <label for="">Select Status</label>
                                 <select class="form-control" name="status2" id="status2" required>
                                     <option value="" disabled selected hidden>Select a Status</option>
-                                    <!-- <option value="Complete">Complete</option> -->
+                                    <option value="Complete">Complete</option>
                                     <option value="Pending">Pending</option>
-                                    <option value="Progress">Progress</option>
+                                    <option value="In Progress">Progress</option>
+                                </select>
+                                <!-- <div id="editStatus_error" class="error"></div> -->
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label for="patient">Patient Name</label>
+                                <input list="patients" class="form-control" name="patient_name" id="patient_name"
+                                    disabled>
+                                <datalist id="patients">
+                                    <?php
+                                    // Query to fetch patients from the database
+                                    $sql2 = "SELECT serial_no, first_name, last_name FROM patients WHERE gender = 'Female' AND age >= 10 AND age < 50 ORDER BY id DESC";
+                                    $result2 = $conn->query($sql2);
+
+                                    if ($result2->num_rows > 0) {
+                                        while ($row2 = $result2->fetch_assoc()) {
+                                            $patientSerialNo = $row2['serial_no'];
+                                            $firstName = $row2['first_name'];
+                                            $lastName = $row2['last_name'];
+
+                                            // Output an option element for each patient with the serial_no as the value
+                                            echo "<option value='$patientSerialNo'>$firstName $lastName</option>";
+                                        }
+                                    } else {
+                                        echo "<option disabled>No patients found</option>";
+                                    }
+                                    ?>
+                                </datalist>
+                                <input type="hidden" name="serial_no2" id="serial_no2">
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label for="">Select Process</label>
+                                <select class="form-control" name="step2" id="step2" required class="">
+                                    <option value="" disabled selected hidden>Select a Step</option>
+                                    <option value="Interview Staff">Interview Staff</option>
+                                    <option value="Consultation">Consultation</option>
+                                    <option value="Immunization">Immunization</option>
+                                    <option value="Prenatal">Prenatal</option>
+                                    <option value="Family Planning">Family Planning</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Nurse">Nurse</option>
+                                    <option value="Midwife">Midwife</option>
+                                    <option value="Head Nurse">Head Nurse</option>
+                                    <option value="Prescription">Prescription</option>
                                 </select>
                                 <!-- <div id="editStatus_error" class="error"></div> -->
                             </div>
@@ -1021,9 +1334,51 @@ if ($result === false) {
                             </div>
                         </div>
                         <div class="col-3">
+                            <div class="form-group">
+                                <label for="hbsag">HBsAG</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="edithbsag" name="hbsag" required>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">IU/mL</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
 
                         </div>
 
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="rbs_fbs">RBS/FBS</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="editrbsfbs" name="rbs_fbs" required>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">mg/dL</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="blood_type">Blood Type</label>
+                                <div class="input-group">
+                                    <select class="form-control" id="editbloodtype" name="blood_type" required>
+                                        <option value="" disabled selected hidden>Select your Blood Type</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
 
@@ -1075,8 +1430,6 @@ if ($result === false) {
                             <br>
                             <div class="form-group">
                                 <div class="checkbox-list">
-
-
                                     <div class="checkbox-item">
                                         <input type="checkbox" id="baby_weight_gt_4kgs2" name="medical_condition"
                                             value="baby_weight_gt_4kgs">
@@ -1112,8 +1465,6 @@ if ($result === false) {
                             </div>
                         </div>
                     </div>
-
-
                     <hr>
 
                     <h5>III ASSESSMENT/DIAGNOSIS</h5>
@@ -1155,31 +1506,31 @@ if ($result === false) {
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label for="">TT1</label>
+                                <label for="">TT1</label><span style="font-size: 15px;">(# of doses)</span>
                                 <input type="text" class="form-control" id="tt12" name="tt12" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
-                                <label for="">TT2</label>
+                                <label for="">TT2</label><span style="font-size: 15px;">(# of doses)</span>
                                 <input type="text" class="form-control" id="tt22" name="tt22" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
-                                <label for="">TT3</label>
+                                <label for="">TT3</label><span style="font-size: 15px;">(# of doses)</span>
                                 <input type="text" class="form-control" id="tt32" name="tt32" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
-                                <label for="">TT4</label>
+                                <label for="">TT4</label><span style="font-size: 15px;">(# of doses)</span>
                                 <input type="text" class="form-control" id="tt42" name="tt42" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
-                                <label for="">TT5</label>
+                                <label for="">TT5</label><span style="font-size: 15px;">(# of doses)</span>
                                 <input type="text" class="form-control" id="tt52" name="tt52" required>
                             </div>
                         </div>
@@ -1314,14 +1665,6 @@ if ($result === false) {
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-
-
-
                     </div>
                 </form>
             </div>
@@ -1353,11 +1696,12 @@ if ($result === false) {
                 columnDefs: [
                     { targets: 0, data: 'id', visible: false },
                     { targets: 1, data: 'serial_no' },
-                    { targets: 2, data: 'last_name' },
+                    { targets: 2, data: 'full_name' },
                     { targets: 3, data: 'checkup_date' },
                     { targets: 4, data: 'status' },
+                    { targets: 5, data: 'steps' },
                     {
-                        targets: 5,
+                        targets: 6,
                         searchable: false,
                         data: null,
                         render: function (data, type, row) {
@@ -1368,7 +1712,9 @@ if ($result === false) {
                     } // Action column
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
 
         <?php else: ?>
@@ -1377,12 +1723,16 @@ if ($result === false) {
                 columnDefs: [
                     { targets: 0, data: 'id', visible: false },
                     { targets: 1, data: 'serial_no' },
-                    { targets: 2, data: 'last_name' },
+                    { targets: 2, data: 'full_name' },
                     { targets: 3, data: 'checkup_date' },
                     { targets: 4, data: 'status' },
+                    { targets: 5, data: 'steps' },
+
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
         <?php endif; ?>
 
@@ -1394,11 +1744,13 @@ if ($result === false) {
                 columnDefs: [
                     { targets: 0, data: 'id', visible: false },
                     { targets: 1, data: 'serial_no' },
-                    { targets: 2, data: 'last_name' },
+                    { targets: 2, data: 'full_name' },
                     { targets: 3, data: 'checkup_date' },
                     { targets: 4, data: 'status' },
+                    { targets: 5, data: 'steps' },
+
                     {
-                        targets: 5,
+                        targets: 6,
                         searchable: false,
                         data: null,
                         render: function (data, type, row) {
@@ -1409,7 +1761,9 @@ if ($result === false) {
                     } // Action column
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
 
 
@@ -1421,7 +1775,10 @@ if ($result === false) {
             var method = $('#method').val();
 
             // Additional fields for prenatal_subjective
+
+            var blood_type = $('#blood_type').val();
             var status = $('#status').val();
+            var steps = $('#step').val();
             var height = $('#height').val();
             var weight = $('#weight').val();
             var temperature = $('#temperature').val();
@@ -1440,6 +1797,8 @@ if ($result === false) {
             var hgb = $('#hgb').val();
             var ua = $('#ua').val();
             var vdrl = $('#vdrl').val();
+            var rbs = $('#rbsfbs').val();
+            var hbsag = $('#hbsag').val();
             // Additional fields for prenatal_diagnosis
             var edc = $('#edc').val();
             var aog = $('#aog').val();
@@ -1498,7 +1857,9 @@ if ($result === false) {
                     method: method,
                     dm: dm,
                     // Include the additional fields for prenatal_subjective
+                    blood_type: blood_type,
                     status: status,
+                    steps: steps,
                     height: height,
                     weight: weight,
                     temperature: temperature,
@@ -1531,6 +1892,8 @@ if ($result === false) {
                     heart_disease: heart_disease,
                     obesity: obesity,
                     goiter: goiter,
+                    hbsag: hbsag,
+                    rbs: rbs,
                     // Include the additional fields for prenatal_diagnosis
                     edc: edc,
                     aog: aog,
@@ -1570,6 +1933,7 @@ if ($result === false) {
                         $('#method').val('');
 
                         // Clear the additional fields
+                        $('#step').val('');
                         $('#status').val('');
                         $('#height').val('');
                         $('#weight').val('');
@@ -1589,6 +1953,8 @@ if ($result === false) {
                         $('#hgb').val('');
                         $('#ua').val('');
                         $('#vdrl').val('');
+                        $('#hbsag').val('');
+                        $('#rbsfbs').val('');
                         $('#edc').val('');
                         $('#aog').val('');
                         $('#date_of_last_delivery').val('');
@@ -1676,7 +2042,9 @@ if ($result === false) {
                     $.ajax({
                         url: 'action/delete_family.php',
                         method: 'POST',
-                        data: { primary_id: deletedataId },
+                        data: {
+                            primary_id: deletedataId
+                        },
                         success: function (response) {
                             if (response === 'Success') {
 
@@ -1703,7 +2071,9 @@ if ($result === false) {
             $.ajax({
                 url: 'action/get_family_by_id.php', // 
                 method: 'POST',
-                data: { primary_id: editId },
+                data: {
+                    primary_id: editId
+                },
                 success: function (data) {
 
                     var editGetData = data;
@@ -1711,7 +2081,9 @@ if ($result === false) {
                     console.log(editGetData);
                     $('#editModal #editdataId').val(editGetData.id);
                     $('#editModal #nurse_id2').val(editGetData.nurse_id);
+                    $('#editModal #patient_name').val(editGetData.full_name);
                     $('#editModal #status2').val(editGetData.status);
+                    $('#editModal #step2').val(editGetData.steps);
                     $('#editModal #height2').val(editGetData.height);
                     $('#editModal #weight2').val(editGetData.weight);
                     $('#editModal #temperature2').val(editGetData.temperature);
@@ -1730,7 +2102,9 @@ if ($result === false) {
                     $('#editModal #hgb2').val(editGetData.hgb);
                     $('#editModal #ua2').val(editGetData.ua);
                     $('#editModal #vdrl2').val(editGetData.vdrl);
-
+                    $('#editModal #edithbsag').val(editGetData.hbsag);
+                    $('#editModal #editrbsfbs').val(editGetData.rbs);
+                    $('#editModal #editbloodtype').val(editGetData.blood_type);
 
                     if (editGetData.forceps_delivery === 'Yes') {
                         $('#forceps_delivery2').prop('checked', true);
@@ -1958,7 +2332,9 @@ if ($result === false) {
 
             var editId = $('#editdataId').val();
             var nurse_id = $('#nurse_id2').val();
+            var patient_id = $('#patient_name').val();
             var status = $('#status2').val();
+            var steps = $('#step2').val();
             var height = $('#height2').val();
             var weight = $('#weight2').val();
             var temperature = $('#temperature2').val();
@@ -2035,6 +2411,7 @@ if ($result === false) {
                     primary_id: editId,
                     nurse_id: nurse_id,
                     status: status,
+                    steps: steps,
                     height: height,
                     weight: weight,
                     temperature: temperature,
@@ -2098,18 +2475,17 @@ if ($result === false) {
                     // Handle the response
                     if (response === 'Success') {
                         updateData();
+                        console.log(response);
                         $('#editModal').modal('hide');
-                        // Remove the modal backdrop manually
                         $('body').removeClass('modal-open');
                         $('.modal-backdrop').remove();
-                        // Show a success Swal notification
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
                             text: 'Prental updated successfully',
                         });
                     } else {
-                        // Show an error Swal notification
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -2127,12 +2503,7 @@ if ($result === false) {
                 }
             });
         });
-
-
-
     });
-
-
 </script>
 
 <script>

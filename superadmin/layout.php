@@ -4,6 +4,11 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "superadmin") {
   header("Location: ../../{$_SESSION['role']}/dashboard/dashboard.php");
   exit;
 }
+
+
+if (!isset($_SESSION['role'])) {
+  header("location: ../../index.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +30,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "superadmin") {
   
   <!-- DataTables CSS -->
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- DataTables JavaScript -->
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -85,7 +90,39 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "superadmin") {
         <?php
         include_once ('../../config.php');
 
-        // Check if user is logged in
+        // Check if the welcome speech has not been played yet
+        if (!isset($_SESSION['welcome_speech_played'])) {
+          // Check if user is logged in
+          if (isset($_SESSION['user_id'])) {
+            $user_id = $_SESSION['user_id'];
+
+            // Query to fetch user's name from admins table
+            $sel = "SELECT * FROM superadmins WHERE user_id = $user_id";
+            $query = mysqli_query($conn, $sel);
+
+            if ($query) {
+              $result = mysqli_fetch_assoc($query);
+
+              if ($result) {
+                // Single welcome voice speech with user's name
+                echo '<script>';
+                echo 'var welcomeMessage = "Welcome, ' . $result['first_name'] . ' ' . $result['last_name'] . '";';
+                echo 'var utterance = new SpeechSynthesisUtterance(welcomeMessage);';
+                echo 'speechSynthesis.speak(utterance);';
+                echo '</script>';
+
+                // Set session variable to indicate that the welcome speech has been played
+                $_SESSION['welcome_speech_played'] = true;
+              } else {
+                echo "No users found";
+              }
+            } else {
+              echo "Query failed: " . mysqli_error($conn);
+            }
+          }
+        }
+
+        // Display user information if logged in
         if (isset($_SESSION['user_id'])) {
           $user_id = $_SESSION['user_id'];
 
@@ -98,12 +135,12 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "superadmin") {
 
             if ($result) {
               ?>
-                                                  <div class="info">
-                                                                                                                                                                 <a href="#" class="d-block">
-                                                                                                                                                                   <?php echo $result['first_name'] . ' ' . $result['last_name']; ?><br />Doctor
-                                                                                                                                                                 </a>
-                                                                                                                                                               </div>
-                                                                                                                                                               <?php
+                                  <div class="info">
+                                    <a href="#" class="d-block">
+                                      <?php echo $result['first_name'] . ' ' . $result['last_name']; ?><br />Doctor
+                                    </a>
+                                  </div>
+                                  <?php
             } else {
               echo "No users found";
             }
@@ -242,20 +279,20 @@ if (
          
 
                   
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="../status/status.php" class="nav-link">
               <i class="fas fa-vial fa-lg "></i>
               <p>
               Status
               </p>
             </a>
-          </li>
+          </li> -->
 
            
-          <li class="nav-item <?php
+          <!-- <li class="nav-item <?php
           if (
             strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/immunization.php') !== false ||
-            strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/family.php') !== false ||
+            strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/report_fam.php') !== false ||
             strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/consultation.php') !== false ||
             strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/prenatal.php') !== false
 
@@ -279,7 +316,7 @@ if (
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="../report/report_famplan.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/report/family.php')
+                  <a href="../report/report_fam.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/report/report_fam.php')
                     echo 'active'; ?>">
                     <i class="fas fa-list fa-lg nav-icon"></i>
                     <p>Family Planning</p>
@@ -299,15 +336,15 @@ if (
                     <p>Prenatal</p>
                   </a>
                 </li>
-                <!-- <li class="nav-item">
+                <li class="nav-item">
                   <a href="../midwife/midwife.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/midwife/midwife.php')
                     echo 'active'; ?>">
                     <i class="fas fa-user-edit fa-lg nav-icon"></i>
                     <p>Midwife</p>
                   </a>
-                </li> -->
+                </li>
               </ul>
-            </li>
+            </li> -->
 
           <li class="nav-item">
             <a href="../announcement/announcement.php" class="nav-link">
@@ -429,6 +466,7 @@ if (
 
 <!-- jQuery -->
 <script src="../../assets/plugins/jquery/jquery.min.js"></script>
+
 <!-- jQuery UI 1.11.4 -->
 <script src="../../assets/plugins/jquery-ui/jquery-ui.min.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->

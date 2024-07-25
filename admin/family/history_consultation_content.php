@@ -4,7 +4,7 @@ include_once ('../../config.php');
 if (isset($_GET['id']) && isset($_GET['patient_id'])) {
     $user_id = $_GET['id'];
 
-    $sql = "SELECT *, fp_information.id AS id, patients.first_name AS first_name, patients.last_name AS last_name, nurses.first_name AS first_name2, nurses.last_name AS last_name2
+    $sql = "SELECT *, fp_information.id AS id, CONCAT(patients.last_name,', ',patients.first_name) as full_name, nurses.first_name AS first_name2, nurses.last_name AS last_name2
     FROM fp_information
     JOIN patients ON fp_information.patient_id = patients.id
     JOIN nurses ON fp_information.nurse_id = nurses.id
@@ -12,7 +12,7 @@ if (isset($_GET['id']) && isset($_GET['patient_id'])) {
     WHERE fp_information.id = $user_id AND fp_consultation.medicine != ''";
 } elseif (isset($_GET['patient_id'])) {
     $patient_id = $_GET['patient_id'];
-    $sql = "SELECT *, fp_information.id AS id, patients.first_name AS first_name, patients.last_name AS last_name, nurses.first_name AS first_name2, nurses.last_name AS last_name2
+    $sql = "SELECT *, fp_information.id AS id, CONCAT(patients.last_name,', ',patients.first_name) as full_name,nurses.first_name AS first_name2, nurses.last_name AS last_name2
     FROM fp_information
     JOIN patients ON fp_information.patient_id = patients.id
     JOIN nurses ON fp_information.nurse_id = nurses.id
@@ -164,15 +164,19 @@ if ($result === false) {
             </div>
         </div>
     </div>
-
+    <style>
+        .tago {
+            display: none;
+        }
+    </style>
     <div class="row">
         <div class="col-12">
             <div class="card-body table-responsive p-0" style="z-index: -99999">
                 <table id="tablebod" class="table table-head-fixed text-nowrap table-striped">
                     <thead class="thead-light">
                         <tr>
-                            <th>ID</th>
-                            <th>Nurse Name</th>
+                            <th class="tago">ID</th>
+                            <th>Patient Name</th>
                             <th>Description</th>
                             <th>Diagnosis</th>
                             <th>Medicine</th>
@@ -186,8 +190,8 @@ if ($result === false) {
                             while ($row = $result->fetch_assoc()) {
                                 ?>
                                 <tr>
-                                    <td class="align-middle"><?php echo $row['id']; ?></td>
-                                    <td class="align-middle"> <?php echo $row['last_name2']; ?></td>
+                                    <td class="align-middle tago"><?php echo $row['id']; ?></td>
+                                    <td class="align-middle"> <?php echo $row['full_name']; ?></td>
                                     <td class="align-middle"><?php echo $row['description']; ?></td>
                                     <td class="align-middle"><?php echo $row['diagnosis']; ?></td>
                                     <td class="align-middle"><?php echo $row['medicine']; ?></td>
@@ -199,8 +203,8 @@ if ($result === false) {
                         } else {
                             ?>
                             <tr>
-                                <td class="align-middle">No Consultation Found</td>
                                 <td class="align-middle"></td>
+                                <td class="align-middle">No Consultation Found</td>
                                 <td class="align-middle">
                                 <td>
                                 <td class="align-middle"></td>
@@ -393,14 +397,16 @@ if ($result === false) {
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="hematoma_bruising_gum_bleeding2"
-                                                        name="medical_condition" value="hematoma_bruising_gum_bleeding" disabled>
+                                                        name="medical_condition" value="hematoma_bruising_gum_bleeding"
+                                                        disabled>
                                                     <label class="checkbox-label">non-traumatic hematoma /
                                                         frequent
                                                         bruising or gum bleeding</label>
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="breast_cancer_breast_mass2"
-                                                        name="medical_condition" value="breast_cancer_breast_mass" disabled>
+                                                        name="medical_condition" value="breast_cancer_breast_mass"
+                                                        disabled>
                                                     <label class="checkbox-label">current or history of breast
                                                         cancer/breast mass</label>
                                                 </div>
@@ -411,7 +417,8 @@ if ($result === false) {
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="cough_more_than_14_days2"
-                                                        name="medical_condition" value="cough_more_than_14_days" disabled>
+                                                        name="medical_condition" value="cough_more_than_14_days"
+                                                        disabled>
                                                     <label class="checkbox-label">cough for more than 14
                                                         days</label>
                                                 </div>
@@ -442,7 +449,8 @@ if ($result === false) {
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="phenobarbital_rifampicin2"
-                                                        name="medical_condition" value="phenobarbital_rifampicin" disabled>
+                                                        name="medical_condition" value="phenobarbital_rifampicin"
+                                                        disabled>
                                                     <label class="checkbox-label">intake of phenobarbital
                                                         (anti-seizure)
                                                         or rifampicin (anti-TB)</label>
@@ -617,14 +625,16 @@ if ($result === false) {
                                         <div class="checkbox-list">
                                             <div class="checkbox-item">
                                                 <input type="checkbox" id="unpleasant_relationship2"
-                                                    name="unpleasant_relationship2" value="unpleasant_relationship" disabled>
+                                                    name="unpleasant_relationship2" value="unpleasant_relationship"
+                                                    disabled>
                                                 <label class="checkbox-label">Create an unpleasant relationship
                                                     with
                                                     partner</label>
                                             </div>
                                             <div class="checkbox-item">
                                                 <input type="checkbox" id="partner_does_not_approve2"
-                                                    name="partner_does_not_approve2" value="partner_does_not_approve" disabled>
+                                                    name="partner_does_not_approve2" value="partner_does_not_approve"
+                                                    disabled>
                                                 <label class="checkbox-label">Partner does not approve of the
                                                     visit to
                                                     FP clinic</label>
@@ -656,33 +666,58 @@ if ($result === false) {
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Weight</label>
-                                        <input type="nutextmber" class="form-control" id="weight2" name="weight2"
-                                            disabled>
+                                        <label for="weight2">Weight</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="weight2" name="weight2"
+                                                disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">kg</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
 
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Blood Pressure</label>
-                                        <input type="text" class="form-control" id="bp2" name="bp2" disabled>
+                                        <label for="bp2">Blood Pressure</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="bp2" name="bp2" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">bp</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Height</label>
-                                        <input type="text" class="form-control" id="height2" name="height2" disabled>
+                                        <label for="height2">Height</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="height2" name="height2"
+                                                disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">cm</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
 
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Pulse Rate</label>
-                                        <input type="text" class="form-control" id="pulse2" name="pulse2" disabled>
+                                        <label for="pulse2">Pulse Rate</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="pulse2" name="pulse2" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">bpm</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
 
                             </div>
@@ -944,28 +979,60 @@ if ($result === false) {
 
         <?php if ($result->num_rows > 0): ?>
             var table = $('#tablebod').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id' },
-                    { targets: 1, data: 'last_name' },
-                    { targets: 2, data: 'description' },
-                    { targets: 3, data: 'diagnosis' },
-                    { targets: 4, data: 'medicine' },
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id', visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'full_name'
+                },
+                {
+                    targets: 2,
+                    data: 'description'
+                },
+                {
+                    targets: 3,
+                    data: 'diagnosis'
+                },
+                {
+                    targets: 4,
+                    data: 'medicine'
+                },
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
         <?php else: ?>
             // Initialize DataTable without the "Action" column when no rows are found
             var table = $('#tablebod').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id' },
-                    { targets: 1, data: 'last_name' },
-                    { targets: 2, data: 'description' },
-                    { targets: 3, data: 'diagnosis' },
-                    { targets: 4, data: 'medicine' },
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id', visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'full_name'
+                },
+                {
+                    targets: 2,
+                    data: 'description'
+                },
+                {
+                    targets: 3,
+                    data: 'diagnosis'
+                },
+                {
+                    targets: 4,
+                    data: 'medicine'
+                },
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
         <?php endif; ?>
 
@@ -974,15 +1041,31 @@ if ($result === false) {
             console.log(patient_id);
             table.destroy(); // Destroy the existing DataTable
             table = $('#tablebod').DataTable({
-                columnDefs: [
-                    { targets: 0, data: 'id' },
-                    { targets: 1, data: 'last_name' },
-                    { targets: 2, data: 'description' },
-                    { targets: 3, data: 'diagnosis' },
-                    { targets: 4, data: 'medicine' },
+                columnDefs: [{
+                    targets: 0,
+                    data: 'id', visible: false
+                },
+                {
+                    targets: 1,
+                    data: 'full_name'
+                },
+                {
+                    targets: 2,
+                    data: 'description'
+                },
+                {
+                    targets: 3,
+                    data: 'diagnosis'
+                },
+                {
+                    targets: 4,
+                    data: 'medicine'
+                },
                 ],
                 // Set the default ordering to 'id' column in descending order
-                order: [[0, 'desc']]
+                order: [
+                    [0, 'desc']
+                ]
             });
 
             // Get data from the form
@@ -1086,7 +1169,9 @@ if ($result === false) {
                     $.ajax({
                         url: 'action/active.php',
                         method: 'POST',
-                        data: { primary_id: deletedataId },
+                        data: {
+                            primary_id: deletedataId
+                        },
                         success: function (response) {
                             if (response === 'Success') {
 
@@ -1113,7 +1198,9 @@ if ($result === false) {
             $.ajax({
                 url: 'action/get_consultation_by_id.php', // 
                 method: 'POST',
-                data: { primary_id: editId },
+                data: {
+                    primary_id: editId
+                },
                 success: function (data) {
 
                     var editGetData = data;
@@ -1186,8 +1273,6 @@ if ($result === false) {
 
 
     });
-
-
 </script>
 <script>
     // Set the timeout duration (in milliseconds)
@@ -1215,7 +1300,6 @@ if ($result === false) {
 </script>
 
 <script>
-
     function recordsBtn(Keydata) {
         console.log(Keydata);
         $.ajax({
@@ -1417,10 +1501,10 @@ if ($result === false) {
                 }
 
 
-                $('#editModal #weight2').val(editGetData.weight);
-                $('#editModal #bp2').val(editGetData.bp);
-                $('#editModal #height2').val(editGetData.height);
-                $('#editModal #pulse2').val(editGetData.pulse);
+                $('#editModal2 #weight2').val(editGetData.weight);
+                $('#editModal2 #bp2').val(editGetData.bp);
+                $('#editModal2 #height2').val(editGetData.height);
+                $('#editModal2 #pulse2').val(editGetData.pulse);
 
                 // Check the appropriate radio button based on the value
                 if (editGetData.extremities === "Normal") {
@@ -1494,6 +1578,4 @@ if ($result === false) {
             },
         });
     }
-
-
 </script>

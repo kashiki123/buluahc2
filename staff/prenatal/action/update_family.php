@@ -27,7 +27,7 @@ function sanitizeInput($input)
     // Remove File Path injection characters
     $input = preg_replace("/[\/\\\\\.\.]/", "", $input);
     // Remove control characters and whitespace
-    $input = preg_replace("/[\x00-\x1F\s]+/", "", $input);
+    // $input = preg_replace("/[\x00-\x1F\s]+/", "", $input);
     // Remove script and content characters
     $input = preg_replace("/<script[^>]*>(.*?)<\/script>/is", "", $input);
     return $input;
@@ -36,6 +36,7 @@ function sanitizeInput($input)
 $primary_id = sanitizeInput($_POST['primary_id']);
 $nurse_id = sanitizeInput($_POST['nurse_id']);
 $status = sanitizeInput($_POST['status']);
+$steps = sanitizeInput($_POST['steps']);
 $height = sanitizeInput($_POST['height']);
 $weight = sanitizeInput($_POST['weight']);
 $temperature = sanitizeInput($_POST['temperature']);
@@ -56,20 +57,35 @@ $ua = sanitizeInput($_POST['ua']);
 $vdrl = sanitizeInput($_POST['vdrl']);
 
 // Checkboxes - Map to "Yes" or "No"
-$forceps_delivery = isset($_POST['forceps_delivery']) ? 'Yes' : 'No';
-$smoking = isset($_POST['smoking']) ? 'Yes' : 'No';
-$allergy_alcohol_intake = isset($_POST['allergy_alcohol_intake']) ? 'Yes' : 'No';
-$previous_cs = isset($_POST['previous_cs']) ? 'Yes' : 'No';
-$consecutive_miscarriage = isset($_POST['consecutive_miscarriage']) ? 'Yes' : 'No';
-$ectopic_pregnancy_h_mole = isset($_POST['ectopic_pregnancy_h_mole']) ? 'Yes' : 'No';
-$pp_bleeding = isset($_POST['pp_bleeding']) ? 'Yes' : 'No';
-$baby_weight_gt_4kgs = isset($_POST['baby_weight_gt_4kgs']) ? 'Yes' : 'No';
-$asthma = isset($_POST['asthma']) ? 'Yes' : 'No';
-$premature_contraction = isset($_POST['premature_contraction']) ? 'Yes' : 'No';
-$dm = isset($_POST['dm']) ? 'Yes' : 'No';
-$heart_disease = isset($_POST['heart_disease']) ? 'Yes' : 'No';
-$obesity = isset($_POST['obesity']) ? 'Yes' : 'No';
-$goiter = isset($_POST['goiter']) ? 'Yes' : 'No';
+
+$forceps_delivery = sanitizeInput($_POST['forceps_delivery']);
+$smoking = sanitizeInput($_POST['smoking']);
+$allergy_alcohol_intake = sanitizeInput($_POST['allergy_alcohol_intake']);
+$previous_cs = sanitizeInput($_POST['previous_cs']);
+$consecutive_miscarriage = sanitizeInput($_POST['consecutive_miscarriage']);
+$ectopic_pregnancy_h_mole = sanitizeInput($_POST['ectopic_pregnancy_h_mole']);
+$pp_bleeding = sanitizeInput($_POST['pp_bleeding']);
+$baby_weight_gt_4kgs = sanitizeInput($_POST['baby_weight_gt_4kgs']);
+$asthma = sanitizeInput($_POST['asthma']);
+$premature_contraction = sanitizeInput($_POST['premature_contraction']);
+$dm = sanitizeInput($_POST['dm']);
+$heart_disease = sanitizeInput($_POST['heart_disease']);
+$obesity = sanitizeInput($_POST['obesity']);
+$goiter = sanitizeInput($_POST['goiter']);
+// $forceps_delivery = isset($_POST['forceps_delivery']) ? 'Yes' : 'No';
+// $smoking = isset($_POST['smoking']) ? 'Yes' : 'No';
+// $allergy_alcohol_intake = isset($_POST['allergy_alcohol_intake']) ? 'Yes' : 'No';
+// $previous_cs = isset($_POST['previous_cs']) ? 'Yes' : 'No';
+// $consecutive_miscarriage = isset($_POST['consecutive_miscarriage']) ? 'Yes' : 'No';
+// $ectopic_pregnancy_h_mole = isset($_POST['ectopic_pregnancy_h_mole']) ? 'Yes' : 'No';
+// $pp_bleeding = isset($_POST['pp_bleeding']) ? 'Yes' : 'No';
+// $baby_weight_gt_4kgs = isset($_POST['baby_weight_gt_4kgs']) ? 'Yes' : 'No';
+// $asthma = isset($_POST['asthma']) ? 'Yes' : 'No';
+// $premature_contraction = isset($_POST['premature_contraction']) ? 'Yes' : 'No';
+// $dm = isset($_POST['dm']) ? 'Yes' : 'No';
+// $heart_disease = isset($_POST['heart_disease']) ? 'Yes' : 'No';
+// $obesity = isset($_POST['obesity']) ? 'Yes' : 'No';
+// $goiter = isset($_POST['goiter']) ? 'Yes' : 'No';
 
 $edc = sanitizeInput($_POST['edc']);
 $aog = sanitizeInput($_POST['aog']);
@@ -106,6 +122,7 @@ try {
     $familyUpdateSql = "UPDATE prenatal_subjective SET 
     nurse_id=?, 
     status=?,
+    steps=?,
     height=?, 
     weight=?, 
     temperature=?, 
@@ -141,9 +158,10 @@ try {
     WHERE id=?";
     $familyStmt = $conn->prepare($familyUpdateSql);
     $familyStmt->bind_param(
-        "ssssssssssssssssssssssssssssssssssi",
+        "sssssssssssssssssssssssssssssssssssi",
         $nurse_id,
         $status,
+        $steps,
         $height,
         $weight,
         $temperature,

@@ -1,72 +1,351 @@
 <?php
-require '../../vendor/autoload.php'; // Include Dompdf's autoloader
+require '../../vendor/autoload.php';
 include_once('../../config.php');
-
-$sql = "SELECT * FROM patients"; // Update this query to match your database structure
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+
+$fromDate = $_GET['fromDate'];
+$toDate = $_GET['toDate'];
+
+$fromDate = $conn->real_escape_string($fromDate);
+$toDate = $conn->real_escape_string($toDate);
+
+$fromDateTime = new DateTime($fromDate);
+$toDateTime = new DateTime($toDate);
+
+$currentMonth = $fromDateTime->format('F');
+$currentYear = $fromDateTime->format('Y');
+
+$fromDate = mysqli_real_escape_string($conn, $fromDate);
+$toDate = mysqli_real_escape_string($conn, $toDate);
+
+
+include('report_queries/prenatal_report_query.php');
 
 // Create a new Dompdf instance
 $pdf = new Dompdf();
 
 // (Optional) Set PDF options, like paper size and orientation
-$pdf->setPaper('A4', 'portrait');
+$pdf->setPaper('A4', 'landscape');
 
-// Fetch patient data using MySQLi (assuming you have a $conn object)
-$result = $conn->query($sql);
-
-// Initialize a variable to keep track of row colors
-$evenRow = false;
-$rowNumber = 1; // Initialize row number
 
 // Generate the HTML content for the PDF
-$htmlContent = '<html>
+$htmlContent = '
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prenatal Care Table</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        table, th, td {
-            border: 1px solid black;
-        }
         th, td {
-            padding: 8px;
+            border: 1px solid black;
+            padding: 6px;
+            text-align: center;
+            font-size: 10px;
         }
-        tr:nth-child(even) {
-            background-color: #f2f2f2; /* Alternate row background color */
+        th {
+            background-color: #f2f2f2;
         }
+      
     </style>
 </head>
 <body>
-    <h1>List of Prenatal</h1>
-    <table>
+<table>
+    <thead>
         <tr>
-            <th>No.</th> <!-- Add the new "Number" column -->
-            <th>First Name</th>
-            <th>Last Name</th>
-            <!-- Add more table headers for other patient data if needed -->
-        </tr>';
-while ($row = $result->fetch_assoc()) {
-    $evenRow = !$evenRow; // Toggle the row color for alternation
-    $rowColorClass = $evenRow ? 'even' : 'odd';
-    
-    $htmlContent .= '<tr class="' . $rowColorClass . '">
-        <td>' . $rowNumber++ . '</td> <!-- Increment and display the row number -->
-        <td>' . $row['first_name'] . '</td>
-        <td>' . $row['last_name'] . '</td>
-        <!-- Add more table data for other patient data if needed -->
-    </tr>';
-}
-$htmlContent .= '</table></body></html>';
+            <th rowspan="2">Indicators</th>
+            <th rowspan="2">Eligible Population</th>
+            <th colspan="8">Age of Pregnant/Postpartum Women</th>
+        </tr>
+        <tr>
+            <th colspan="2">10-14</th>
+            <th colspan="2">15-19</th>
+            <th colspan="2">20-49</th>
+            <th colspan="2">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td></td>
+            <td rowspan="17"></td>
+            <td>No.</td>
+            <td>%</td>
+            <td>No.</td>
+            <td>%</td>
+            <td>No.</td>
+            <td>%</td>
+            <td>No.</td>
+            <td>%</td>
+        </tr>
+        <tr>
+        <td>No. of pregnant women at least 4 prenatal check-ups - Total</td>
+            <td>' . $countForPrenatal10to14 . '</td>
+            <td></td>
+            <td>' . $countForPrenatal15to19 . '</td>
+            <td></td>
+            <td>' . $countForPrenatal20to49 . '</td>
+            <td></td>
+            <td>' . $countForPrenatalTotal . '</td>
+            <td>' . $percentForPrenatalFormatted . '%</td>
+            
+        </tr>
+        <tr>
+            <td>No. of pregnant women assessed of their nutritional status during the 1st trimester - Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            
+        </tr>
+        <tr>
+            <td>a. No. of pregnant women seen in the first trimester who have normal BMI - Total</td>
+            <td>' . $countABMI10to14 . '</td>
+            <td></td>
+            <td>' . $countABMI15to19 . '</td>
+            <td></td>
+            <td>' . $countABMI20to49 . '</td>
+            <td></td>
+            <td>' . $countTotalABMI . '</td>
+            <td>' . $percentABMIFormatted . '%</td>
+        </tr>
+        <tr>
+            <td>b. No. of pregnant women seen in the first trimester who have low BMI - Total</td>
+            <td>' . $countBMI10to14 . '</td>
+            <td></td>
+            <td>' . $countBMI15to19 . '</td>
+            <td></td>
+            <td>' . $countBMI20to49 . '</td>
+            <td></td>
+            <td>' . $totalLowBMI . '</td>
+            <td>' . $percentLowBmiFormatted . '%</td>
+        </tr>
+        <tr>
+            <td>c. No. of pregnant women seen in the first trimester who have high BMI - Total</td>
+            <td>' . $countHighBMI10to14 . '</td>
+            <td></td>
+            <td>' . $countHighBMI15to19 . '</td>
+            <td></td>
+            <td>' . $countHighBMI20to49 . '</td>
+            <td></td>
+            <td>' . $totalHighBMI . '</td>
+            <td>' . $percentHighBMIFormatted . '%</td>
+        </tr>
+        <tr>
+            <td>No. of pregnant women for the first time given at least 2 doses of Td vaccination (Td2 Plus) - Total</td>
+            <td>' . $countFirstTimePregnantWithTd2Plus10to14 . '</td>
+            <td></td>
+            <td>' . $countFirstTimePregnantWithTd2Plus15to19 . '</td>
+            <td></td>
+            <td>' . $countFirstTimePregnantWithTd2Plus20to49 . '</td>
+            <td></td>
+            <td>' . $totalCountForFirstTimePregnantWithTd2Plus . '</td>
+            <td>' . $percentTd2Plus1stFormatted . '%</td>
+        </tr>
+        <tr>
+            <td>No. of pregnant women for the 2nd or more times given at least 3 doses of Td vaccination (Td2 Plus) - Total</td>
+            <td>' . $countSecondTimeTdVacc10to14 . '</td>
+            <td></td>
+            <td>' . $countSecondTimeTdVacc15to19 . '</td>
+            <td></td>
+            <td>' . $countSecondTimeTdVacc20to49 . '</td>
+            <td></td>
+            <td>' . $countTotalSecondTime . '</td>
+            <td>' . $percentTotalSecondTimeFormatted . '%</td>
+        </tr>
 
+        <tr>
+            <td>No. of pregnant women screened for syphilis - Total</td>
+            <td>' . $countSyphilis10to14 . '</td>
+            <td></td>
+            <td>' . $countSyphilis15to19 . '</td>
+            <td></td>
+            <td>' . $countSyphilis20to49 . '</td>
+            <td></td>
+            <td>' . $totalSyphilisCount . '</td>
+            <td>' . $totalSyphilisCountPercentFormatted . '%</td>
+        </tr>
+        <tr>
+            <td>No. of pregnant women tested positive for syphilis - Total</td>
+            <td>' . $countVDRL10to14 . '</td>
+            <td></td>
+            <td>' . $countVDRL10to14 . '</td>
+            <td></td>
+            <td>' . $countVDRL10to14 . '</td>
+            <td></td>
+            <td>' . $totalVdrlCount . '</td>
+            <td>' . $totalVdrlCountPercentFormatted . '%</td>
+            </tr>
+            <tr>
+            <td>No. of pregnant women screened for Hepatitis B - Total</td>
+            <td>' . $countHbsag10to14 . '</td>
+            <td></td>
+            <td>' . $countHbsag15to19 . '</td>
+            <td></td>
+            <td>' . $countHbsag20to49 . '</td>
+            <td></td>
+            <td>' . $TotalcountHbsag . '</td>
+            <td>' . $TotalcountHbsagPercentFormatted . '%</td>
+            </tr>
+            <tr>
+            <td>No. of pregnant women tested positive for Hepatitis B - Total</td>
+            <td>'.$countHbsagPositive10to14.'</td>
+            <td></td>
+            <td>'.$countHbsagPositive15to19.'</td>
+            <td></td>
+            <td>'.$countHbsagPositive20to49.'</td>
+            <td></td>
+            <td>'.$totalHbsagPositive.'</td>
+            <td>'.$totalHbsagPositivePercentFormatted.'</td>
+            </tr>
+            <tr>
+            <td>No. of pregnant women screened for HIV - Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            </tr>
+            <tr>
+            <td>No. of pregnant women tested positive for HIV - Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            </tr>
+            <tr>
+            <td>No. of pregnant women tested for CBC or Hgb&Hct count - Total</td>
+            <td>' . $countCbc10to14 . '</td>
+            <td></td>
+            <td>' . $countCbc15to19 . '</td>
+            <td></td>
+            <td>' . $countCbc20to49 . '</td>
+            <td></td>
+            <td>' . $cbcTotal . '</td>
+            <td>' . $cbcTotalPercentFormatted . '%</td>
+            </tr>
+            <tr>
+            <td>No. of pregnant women tested for CBC or Hgb&Hct count diagnosed with anemia - Total</td>
+            <td>' . $countAnemia10to14 . '</td>
+            <td></td>
+            <td>' . $countAnemia15to19 . '</td>
+            <td></td>
+            <td>' . $countAnemia20to49 . '</td>
+            <td></td>
+            <td>' . $totalAnemiaCount . '</td>
+            <td>' . $totalAnemiaCountPercentFormatted . '%</td>
+            </tr>
+            <tr>
+            <td>No. of pregnant women screened for gestational diabetes - Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            </tr>
+            </tbody>
+            </table>
+            </body>
+            </html>';
 // Load HTML content into Dompdf
 $pdf->loadHtml($htmlContent);
 
 // Render the HTML to PDF
 $pdf->render();
 
-// Output the PDF to the browser
-$pdf->stream();
-?>
+// Get the PDF content
+$pdfContent = $pdf->output();
+
+// Send the appropriate headers for a PDF file
+header('Content-Type: application/pdf');
+header('Content-Disposition: inline; filename="prenatal_report.pdf"');
+
+// Output the PDF content
+echo $pdfContent;
+
+// Close the connection
+$conn->close();
+
+// Script to open PDF in a new tab
+echo '<script>
+            var blob = new Blob([' . json_encode($pdfContent) . '], {type: "application/pdf"});
+            var url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
+            </script>';
+
+        //     <tr>
+        //     <td>No. of pregnant women who completed the dose of iron with folic acid supplementation - Total</td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        // </tr>
+        // <tr>
+        //     <td>No. of pregnant women who completed doses of calcium carbonate supplementation - Total</td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        // </tr>
+        // <tr>
+        //     <td>No. of pregnant women given iodine capsules - Total</td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        // </tr>
+        // <tr>
+        //     <td>No. of pregnant women given one dose of deworming tablet - Total</td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        // </tr>
+        // <tr>
+        //     <td>No. of pregnant women given two doses of deworming tablet - Total</td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        //     <td></td>
+        // </tr>

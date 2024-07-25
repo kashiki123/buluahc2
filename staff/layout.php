@@ -4,6 +4,10 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
   header("Location: ../../{$_SESSION['role']}/dashboard/dashboard.php");
   exit;
 }
+
+if (!isset($_SESSION['role'])) {
+  header("location: ../../index.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,8 +17,11 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Brgy Health Center</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+    integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -34,6 +41,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
   <script type="text/javascript" charset="utf8"
     src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 </head>
 <style>
@@ -97,7 +105,39 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
           <?php
           include_once ('../../config.php');
 
-          // Check if user is logged in
+          // Check if the welcome speech has not been played yet
+          if (!isset($_SESSION['welcome_speech_played'])) {
+            // Check if user is logged in
+            if (isset($_SESSION['user_id'])) {
+              $user_id = $_SESSION['user_id'];
+
+              // Query to fetch user's name from admins table
+              $sel = "SELECT * FROM staffs WHERE user_id = $user_id";
+              $query = mysqli_query($conn, $sel);
+
+              if ($query) {
+                $result = mysqli_fetch_assoc($query);
+
+                if ($result) {
+                  // Single welcome voice speech with user's name
+                  echo '<script>';
+                  echo 'var welcomeMessage = "Welcome, ' . $result['first_name'] . ' ' . $result['last_name'] . '";';
+                  echo 'var utterance = new SpeechSynthesisUtterance(welcomeMessage);';
+                  echo 'speechSynthesis.speak(utterance);';
+                  echo '</script>';
+
+                  // Set session variable to indicate that the welcome speech has been played
+                  $_SESSION['welcome_speech_played'] = true;
+                } else {
+                  echo "No users found";
+                }
+              } else {
+                echo "Query failed: " . mysqli_error($conn);
+              }
+            }
+          }
+
+          // Display user information if logged in
           if (isset($_SESSION['user_id'])) {
             $user_id = $_SESSION['user_id'];
 
@@ -126,6 +166,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
           ?>
 
 
+
         </div>
 
 
@@ -147,28 +188,80 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
               <a href="../patient/patient.php" class="nav-link">
                 <i class="fa fa-users fa-lg" aria-hidden="true"></i>
                 <p>
-                 Patient List
+                  Patient List
                 </p>
               </a>
             </li>
 
             <li class="nav-item ">
 
+            <li class="nav-item <?php
+            if (
+              strpos($_SERVER['REQUEST_URI'], '/brgyv2/staff//consultation/consultation.php') !== false ||
+              strpos($_SERVER['REQUEST_URI'], '/brgyv2/staff/family/family.php') !== false ||
+              strpos($_SERVER['REQUEST_URI'], '/brgyv2/staff/prenatal/prenatal.php') !== false ||
+              strpos($_SERVER['REQUEST_URI'], '/brgyv2/staff/immunization/immunization.php') !== false
 
-
-
-
-            <li class="nav-item">
+            ) {
+              echo 'menu-open';
+            }
+            ?>">
+              <a href="" class="nav-link">
+                <i class="fa fa-cog fa-lg" aria-hidden="false"></i>
+                <p>
+                  Services
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="../consultation/consultation.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/staff/consultation/consultation.php')
+                    echo 'active'; ?>">
+                    <i class="fas fa-file-prescription fa-lg"></i>
+                    <p>Consultation</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../family/family.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/staff/family/family.php')
+                    echo 'active'; ?>">
+                    <i class="fas fa-file-medical fa-lg "></i>
+                    <p>Family Planning</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../prenatal/prenatal.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/staff/prenatal/prenatal.php')
+                    echo 'active'; ?>">
+                    <i class="fas fa-file-medical-alt fa-lg"></i>
+                    <p>Prenatal</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../immunization/immunization.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/staff/immunization/immunization.php')
+                    echo 'active'; ?>">
+                    <i class="fas fa-file-medical-alt fa-lg"></i>
+                    <p>Immunization</p>
+                  </a>
+                </li>
+                <!-- <li class="nav-item">
+                  <a href="../midwife/midwife.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/midwife/midwife.php')
+                    echo 'active'; ?>">
+                    <i class="fas fa-user-edit fa-lg nav-icon"></i>
+                    <p>Midwife</p>
+                  </a>
+                </li> -->
+              </ul>
+            </li>
+            <!-- <li class="nav-item">
               <a href="../consultation/consultation.php" class="nav-link">
                 <i class="fas fa-file-prescription fa-lg "></i>
                 <p>
                   Consultation
                 </p>
               </a>
-            </li>
+            </li> -->
 
 
-
+            <!-- 
             <li class="nav-item">
               <a href="../family/family.php" class="nav-link">
                 <i class="fas fa-file-medical fa-lg "></i>
@@ -176,10 +269,10 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
                   Family Planning
                 </p>
               </a>
-            </li>
+            </li> -->
 
 
-
+            <!-- 
             <li class="nav-item">
               <a href="../prenatal/prenatal.php" class="nav-link">
                 <i class="fas fa-file-medical-alt fa-lg "></i>
@@ -196,75 +289,27 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
                   Immunization
                 </p>
               </a>
-            </li>
+            </li> -->
 
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a href="../status/status.php" class="nav-link">
                 <i class="fas fa-vial fa-lg "></i>
                 <p>
                   Status
                 </p>
               </a>
-            </li>
+            </li> -->
 
 
 
-            <li class="nav-item <?php
-            if (
-              strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/immunization.php') !== false ||
-              strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/family.php') !== false ||
-              strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/consultation.php') !== false ||
-              strpos($_SERVER['REQUEST_URI'], '/brgyv2/admin/report/prenatal.php') !== false
-
-            ) {
-              echo 'menu-open';
-            }
-            ?>">
-              <a href="" class=" nav-link">
+            <li class=" nav-item" data-toggle="modal" data-target="#reportsModal">
+              <a href="#" class=" nav-link">
                 <i class="fa fa-book fa-lg" aria-hidden="true"></i>
                 <p>
-                  Report
-                  <i class="fas fa-angle-left right"></i>
+                  Generate Report
                 </p>
               </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="../report/immunization.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/report/immunization.php')
-                    echo 'active'; ?>">
-                    <i class="fas fa-list fa-lg nav-icon"></i>
-                    <p>Immunization</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="../report/family.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/report/family.php')
-                    echo 'active'; ?>">
-                    <i class="fas fa-list fa-lg nav-icon"></i>
-                    <p>Family Planning</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="../report/consultation.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/report/consultation.php')
-                    echo 'active'; ?>">
-                    <i class="fas fa-list fa-lg nav-icon"></i>
-                    <p>Consultation</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="../report/prenatal.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/report/prenatal.php')
-                    echo 'active'; ?>">
-                    <i class="fas fa-list fa-lg nav-icon"></i>
-                    <p>Prenatal</p>
-                  </a>
-                </li>
-                <!-- <li class="nav-item">
-                  <a href="../midwife/midwife.php" class="nav-link <?php if ($_SERVER['REQUEST_URI'] === '/brgyv2/admin/midwife/midwife.php')
-                    echo 'active'; ?>">
-                    <i class="fas fa-user-edit fa-lg nav-icon"></i>
-                    <p>Midwife</p>
-                  </a>
-                </li> -->
-              </ul>
             </li>
 
 
@@ -310,6 +355,79 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "staff") {
     <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
+  <!-- GENERATE REPORTS Modal -->
+  <div class="modal fade" id="reportsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+    style="z-index: 1050;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">GENERATE REPORTS</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="fromDate">From Date:</label>
+            <input type="date" class="form-control" id="fromDate" placeholder="Select From Date">
+          </div>
+          <div class="form-group">
+            <label for="toDate">To Date:</label>
+            <input type="date" class="form-control" id="toDates" placeholder="Select To Date">
+          </div>
+          <div class="form-group">
+            <label for="reportType">Report Type:</label>
+            <select class="form-control" id="reportType">
+              <option value="none" selected disabled>-Select Report Type-</option>
+              <option value="Patients">Patient List</option>
+              <option value="Consultation">Consultations</option>
+              <option value="Immunization">Immunization</option>
+              <option value="FamPlan">Family Planning</option>
+              <option value="Prenatal">Prenatal</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT FOR GENERATING REPORTS -->
+  <script>
+    function generateReport() {
+      var fromDate = document.getElementById("fromDate").value;
+      var toDate = document.getElementById("toDates").value;
+      var reportType = document.getElementById("reportType").value;
+
+      switch (reportType) {
+        case "Patients":
+          var url = "../report/generate-patient.php?fromDate=" + fromDate + "&toDate=" + toDate;
+          window.open(url, '_blank');
+          break;
+        case "Consultation":
+          var url = "../report/generate-consultation.php?fromDate=" + fromDate + "&toDate=" + toDate;
+          window.open(url, '_blank');
+          break;
+        case "Immunization":
+          var url = "../report/generate-immunization.php?fromDate=" + fromDate + "&toDate=" + toDate;
+          window.open(url, '_blank');
+          break;
+        case "FamPlan":
+          var url = "../report/generate_famplan.php?fromDate=" + fromDate + "&toDate=" + toDate;
+          window.open(url, '_blank');
+          break;
+        case "Prenatal":
+          var url = "../report/generate-prenatal.php?fromDate=" + fromDate + "&toDates=" + toDate;
+          window.open(url, '_blank');
+          break;
+      }
+
+    }
+  </script>
+
 
   <!-- jQuery -->
   <script src="../../assets/plugins/jquery/jquery.min.js"></script>

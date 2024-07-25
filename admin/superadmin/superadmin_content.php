@@ -9,7 +9,7 @@ $sql = "SELECT * FROM superadmins WHERE is_active = 0 ORDER BY id DESC";
 $result = $conn->query($sql);
 
 if ($result === false) {
-    die ("Query failed: " . $conn->error);
+    die("Query failed: " . $conn->error);
 }
 
 ?>
@@ -55,11 +55,16 @@ if ($result === false) {
                             <div id="address_error" class="error"></div>
                         </div>
                         <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            <div id="email_error" class="error"></div>
+                        </div>
+                        <!-- <div class="form-group">
                             <label for="username">Username</label>
                             <input type="text" class="form-control" id="username" name="username" required>
                             <div id="username_error" class="error"></div>
-                        </div>
-                  
+                        </div> -->
+
                         <div class="form-group">
                             <label for="Password">Password</label>
                             <div class="input-group">
@@ -95,7 +100,7 @@ if ($result === false) {
                                         toggleIcon.removeClass("bi-eye").addClass("bi-eye-slash");
                                     } else {
                                         passwordField.attr("type", "password");
-                                     
+
                                         toggleIcon.removeClass("bi-eye-slash").addClass("bi-eye");
                                     }
                                 });
@@ -112,13 +117,18 @@ if ($result === false) {
             </div>
         </div>
     </div>
+    <style>
+        .tago{
+            display: none;
+        }
+    </style>
     <div class="row">
         <div class="col-12">
             <div class="card-body table-responsive p-0" style="z-index: -99999">
                 <table id="tablebod" class="table table-head-fixed text-nowrap table-striped">
                     <thead class="thead-light">
                         <tr>
-                            <th>ID</th>
+                            <th class="tago">ID</th>
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Birthdate</th>
@@ -132,7 +142,7 @@ if ($result === false) {
                             while ($row = $result->fetch_assoc()) {
                                 ?>
                                 <tr>
-                                    <td class="align-middle">
+                                    <td class="align-middle tago">
                                         <?php echo $row['id']; ?>
                                     </td>
                                     <td class="align-middle">
@@ -161,8 +171,8 @@ if ($result === false) {
                         } else {
                             ?>
                             <tr>
-                                <td class="align-middle">No Superadmin Found</td>
                                 <td class="align-middle"></td>
+                                <td class="align-middle">No Superadmin Found</td>
                                 <td class="align-middle">
                                 <td>
                                 <td class="align-middle"></td>
@@ -214,10 +224,15 @@ if ($result === false) {
                             <div id="editAddress_error" class="error"></div>
                         </div>
                         <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="editemail" name="email" required>
+                            <div id="editemail_error" class="error"></div>
+                        </div>
+                        <!-- <div class="form-group">
                             <label for="ediuser">Username</label>
                             <input type="text" class="form-control" id="ediuser" name="username" required>
                             <div id="ediuser_error" class="error"></div>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label for="editPassword">Password</label>
                             <div class="input-group">
@@ -251,11 +266,11 @@ if ($result === false) {
                                     if (passwordField.attr("type") == "password") {
                                         passwordField.attr("type", "text");
                                         toggleIcon.removeClass("bi-eye").addClass("bi-eye-slash");
-                                        
+
                                     } else {
                                         passwordField.attr("type", "password");
                                         toggleIcon.removeClass("bi-eye-slash").addClass("bi-eye");
-                                      
+
                                     }
                                 });
                             });
@@ -276,7 +291,7 @@ if ($result === false) {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script>
+<!-- <script>
     $(document).ready(function () {
         $('#username').on('change', function () {
 
@@ -326,7 +341,7 @@ if ($result === false) {
             });
         });
     });
-</script>
+</script> -->
 <script>
     $(document).ready(function () {
 
@@ -338,7 +353,7 @@ if ($result === false) {
         <?php if ($result->num_rows > 0): ?>
             var table = $('#tablebod').DataTable({
                 columnDefs: [
-                    { targets: 0, data: 'id' },
+                    { targets: 0, data: 'id' , visible: false},
                     { targets: 1, data: 'first_name' },
                     { targets: 2, data: 'last_name' },
                     { targets: 3, data: 'birthdate' },
@@ -361,7 +376,7 @@ if ($result === false) {
             // Initialize DataTable without the "Action" column when no rows are found
             var table = $('#tablebod').DataTable({
                 columnDefs: [
-                    { targets: 0, data: 'id' },
+                    { targets: 0, data: 'id' , visible: false},
                     { targets: 1, data: 'first_name' },
                     { targets: 2, data: 'last_name' },
                     { targets: 3, data: 'birthdate' },
@@ -376,7 +391,7 @@ if ($result === false) {
             table.destroy(); // Destroy the existing DataTable
             table = $('#tablebod').DataTable({
                 columnDefs: [
-                    { targets: 0, data: 'id' },
+                    { targets: 0, data: 'id', visible: false },
                     { targets: 1, data: 'first_name' },
                     { targets: 2, data: 'last_name' },
                     { targets: 3, data: 'birthdate' },
@@ -405,7 +420,8 @@ if ($result === false) {
             var last_name = $('#last_name').val();
             var birthdate = $('#birthdate').val();
             var address = $('#address').val();
-            var username = $('#username').val();
+            var email = $('#email').val();
+            // var username = $('#username').val();
             var password = $('#password').val();
             // Validate input fields
             var isValid = true;
@@ -438,10 +454,14 @@ if ($result === false) {
                 $('#address_error').text('Field is required');
                 isValid = false;
             }
-            if (username.trim() === '') {
-                $('#username_error').text('Field is required');
+            if (email.trim() === '') {
+                $('#email_error').text('Field is required');
                 isValid = false;
             }
+            // if (username.trim() === '') {
+            //     $('#username_error').text('Field is required');
+            //     isValid = false;
+            // }
 
             if (password.trim() === '') {
                 $('#password_error').text('Field is required');
@@ -459,7 +479,8 @@ if ($result === false) {
                         last_name: last_name,
                         birthdate: birthdate,
                         address: address,
-                        username: username,
+                        email: email,
+                        // username: username,
                         password: password
                     },
                     success: function (response) {
@@ -470,7 +491,8 @@ if ($result === false) {
                             $('#last_name').val('');
                             $('#birthdate').val('');
                             $('#address').val('');
-                            $('#username').val('');
+                            $('#email').val('');
+                            // $('#username').val('');
                             $('#password').val('');
 
                             updateData();
@@ -583,7 +605,8 @@ if ($result === false) {
                     $('#editModal #editLastName').val(editGetData.last_name);
                     $('#editModal #editBirthdate').val(editGetData.birthdate);
                     $('#editModal #editAddress').val(editGetData.address);
-                    $('#editModal #ediuser').val(editGetData.username);
+                    $('#editModal #editemail').val(editGetData.email);
+                    // $('#editModal #ediuser').val(editGetData.username);
                     // $('#editModal #editPassword').val(editGetData.password);
 
                     $('#editModal').modal('show');
@@ -603,7 +626,8 @@ if ($result === false) {
             var lastName = $('#editLastName').val();
             var birthdate = $('#editBirthdate').val();
             var address = $('#editAddress').val();
-            var username = $('#ediuser').val();
+            var email = $('#editemail').val();
+            // var username = $('#ediuser').val();
             var password = $('#editPassword').val();
 
             // Validate input fields
@@ -628,11 +652,15 @@ if ($result === false) {
                 $('#editAddress_error').text('Field is required');
                 isValid = false;
             }
-
-            if (username.trim() === '') {
-                $('#ediuser_error').text('Field is required');
+            if (email.trim() === '') {
+                $('#editemail_error').text('Field is required');
                 isValid = false;
             }
+
+            // if (username.trim() === '') {
+            //     $('#ediuser_error').text('Field is required');
+            //     isValid = false;
+            // }
 
             // if (password.trim() === '') {
             //     $('#editPassword_error').text('Field is required');
@@ -652,7 +680,8 @@ if ($result === false) {
                         last_name: lastName,
                         birthdate: birthdate,
                         address: address,
-                        username: username,
+                        email: email,
+                        // username: username,
                         password: password
                     },
                     success: function (response) {

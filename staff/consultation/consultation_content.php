@@ -9,9 +9,10 @@ if (isset($_GET['date'])) {
     $date = $selected_date;
 }
 
-$sql = "SELECT *, consultations.id AS id, CONCAT(patients.last_name, ',', patients.first_name) AS full_name
+$sql = "SELECT *, consultations.id AS id, CONCAT(patients.last_name, ', ', patients.first_name) AS full_name
         FROM consultations
         JOIN patients ON consultations.patient_id = patients.id
+        JOIN fp_physical_examination ON consultations.id = fp_physical_examination.id
         WHERE consultations.is_active = 0 AND consultations.is_deleted = 0 AND checkup_date = '$date'";
 
 $result = $conn->query($sql);
@@ -22,30 +23,34 @@ if ($result === false) {
 ?>
 
 <div class="container-fluid">
-    <div style="text-align: left; float: left;">
-        <button type="button" id="openModalButton" class="btn btn-primary">
-            Add Consultation
-        </button>
-    </div>
-
-    <div style="text-align: left; float: left;">
-        <a href="archive_consultation.php">
-            <button type="button" id="openModalButton" class="btn btn-danger ml-1">
-                View Archive
+    <div class="row">
+        <div style="text-align: left; float: left;">
+            <button type="button" id="openModalButton" class="btn btn-primary">
+                Add Consultation
             </button>
-        </a>
-    </div>
-    <!-- <a href="history_consultation.php">
+        </div>
+
+        <div style="text-align: left; float: left;">
+            <a href="archive_consultation.php">
+                <button type="button" id="openModalButton" class="btn btn-danger ml-1">
+                    View Archive
+                </button>
+            </a>
+        </div>
+        <!-- <a href="history_consultation.php">
         <button type="button" id="openModalButton" class="btn btn-warning ml-1">
             View History
         </button>
     </a> -->
-    <div style="text-align: left; float: left; margin-left: 10px;">
-        <form action="" method="GET">
-            <input type="text" class="form-control" id="datepicker" name="date" placeholder="Select Date"
-                onchange="this.form.submit()">
-        </form>
+
+        <div style="text-align: left; float: left; margin-left: 10px;">
+            <form action="" method="GET">
+                <input type="text" class="form-control" id="datepicker" name="date" placeholder="Select Date"
+                    onchange="this.form.submit()">
+            </form>
+        </div>
     </div>
+
 
     <br><br>
 
@@ -63,16 +68,39 @@ if ($result === false) {
                 <div class="modal-body">
                     <form id="addForm">
                         <!-- Form fields go here -->
+                        <style>
+                            .otag {
+                                display: none;
+                            }
+                        </style>
+                        <div class="form-group otag">
+                            <label for="">Select Step</label>
+                            <select class="form-control" name="step" id="step" required class="">
+                                <option value="" disabled selected hidden>Select a Step</option>
+                                <option value="Interview Staff">Interview Staff</option>
+                                <option value="Consultation">Consultation</option>
+                                <option value="Immunization">Immunization</option>
+                                <option value="Prenatal">Prenatal</option>
+                                <option value="Family Planning">Family Planning</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Nurse">Nurse</option>
+                                <option value="Midwife">Midwife</option>
+                                <option value="Head Nurse">Head Nurse</option>
+                                <option value="Prescription">Prescription</option>
+                            </select>
+                            <!-- <div id="editStatus_error" class="error"></div> -->
+                        </div>
                         <div class="row">
                             <div class="col-sm">
                                 <div class="form-group">
-                                    <label for="patient">Select Patient</label>
+                                    <label for="patient">Select Patient</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input list="patients" class="form-control" name="patient_id" id="patient_id"
                                         required>
                                     <datalist id="patients">
                                         <?php
-                                        // Query to fetch patients from the database
-                                        $sql2 = "SELECT serial_no, first_name, last_name FROM patients ORDER BY id DESC";
+                                        // Query to fetch patients from the database who are not deleted
+                                        $sql2 = "SELECT serial_no, first_name, last_name FROM patients WHERE is_deleted = 0 ORDER BY id DESC";
                                         $result2 = $conn->query($sql2);
 
                                         if ($result2->num_rows > 0) {
@@ -88,6 +116,7 @@ if ($result === false) {
                                             echo "<option disabled>No patients found</option>";
                                         }
                                         ?>
+
                                     </datalist>
                                     <input type="hidden" name="serial_no" id="serial_no">
 
@@ -109,7 +138,8 @@ if ($result === false) {
                             </div>
                             <div class="col-sm">
                                 <div class="form-group">
-                                    <label for="">Select Doctor</label>
+                                    <label for="">Select Doctor</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <select class="form-control" name="doctor_id" id="doctor_id" required>
                                         <option value="" disabled selected hidden>Select Doctor</option>
                                         <?php
@@ -138,7 +168,12 @@ if ($result === false) {
 
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <style>
+                                .otag {
+                                    display: none;
+                                }
+                            </style>
+                            <div class="col-4 otag">
                                 <div class="form-group">
                                     <label for="">Select Status</label>
                                     <select class="form-control" name="status" id="status" required>
@@ -150,44 +185,28 @@ if ($result === false) {
                                     <!-- <div id="editStatus_error" class="error"></div> -->
                                 </div>
                             </div>
-                            <style>
-                                .otag {
-                                    display: none;
-                                }
-                            </style>
-                            <div class="form-group otag">
-                                <label for="">Select Step</label>
-                                <select class="form-control" name="step" id="step" required class="">
-                                    <option value="" disabled selected hidden>Select a Step</option>
-                                    <option value="Interview Staff">Interview Staff</option>
-                                    <option value="Consultation">Consultation</option>
-                                    <option value="Immunization">Immunization</option>
-                                    <option value="Prenatal">Prenatal</option>
-                                    <option value="Family Planning">Family Planning</option>
-                                    <option value="Doctor">Doctor</option>
-                                    <option value="Nurse">Nurse</option>
-                                    <option value="Midwife">Midwife</option>
-                                    <option value="Head Nurse">Head Nurse</option>
-                                    <option value="Prescription">Prescription</option>
-                                </select>
-                                <!-- <div id="editStatus_error" class="error"></div> -->
-                            </div>
-                            <!-- <div class="col-sm">
+
+                            <div class="col-sm">
                                 <div class="form-group">
-                                    <label for="">Checkup Date</label>
+                                    <label for="">Checkup Date</label><span
+                                        style="color: red; font-size: 22px;">*</span>
                                     <input type="date" class="form-control" id="checkup_date" name="checkup_date"
                                         required>
                                 </div>
                             </div>
-                             <script>
-                            var today = new Date();
-                            var dd = String(today.getDate()).padStart(2, '0');
-                            var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
-                            var yyyy = today.getFullYear();
+                            <script>
+                                // Get the current date
+                                var today = new Date();
 
-                            today = yyyy + '-' + mm + '-' + dd;
-                            document.getElementById('checkup_date').min = today;
-                        </script> -->
+                                // Calculate the date for tomorrow
+                                today.setDate(today.getDate() + 1);
+
+                                // Format the date to match the input type="date" format (YYYY-MM-DD)
+                                var tomorrow = today.toISOString().split('T')[0];
+
+                                // Set the minimum date for the input element
+                                document.getElementById('checkup_date').min = tomorrow;
+                            </script>
                         </div>
 
 
@@ -196,17 +215,18 @@ if ($result === false) {
                             <div class="col-sm">
 
                                 <div class="form-group">
-                                    <label for="">Subjective</label>
+                                    <label for="">Subjective</label><span style="color: red; font-size: 22px;">*</span>
                                     <textarea class="form-control" id="subjective" name="subjective" rows="3"
+                                        placeholder="e.g., sakit ng tiyan (stomach pain), headache, patient's verbal report"
                                         required></textarea>
                                 </div>
                             </div>
                             <div class="col-sm">
 
                                 <div class="form-group">
-                                    <label for="">Objective</label>
-                                    <textarea class="form-control" id="objective" name="objective" rows="3"
-                                        required></textarea>
+                                    <label for="">Objective</label><span style="color: red; font-size: 22px;">*</span>
+                                    <textarea class="form-control" id="objective" name="objective" rows="3" placeholder="vital signs - temperature, pulse rate, bp, respiration.
+assessment: diagnosis" required></textarea>
                                 </div>
                             </div>
                             <div class="col-sm">
@@ -214,14 +234,15 @@ if ($result === false) {
                                 <div class="form-group">
                                     <label for="">Assessment</label>
                                     <textarea class="form-control" id="assessment" name="assessment" rows="3"
-                                        required></textarea>
+                                        placeholder="Patient's diagnosis "></textarea>
                                 </div>
                             </div>
                             <div class="col-sm">
 
                                 <div class="form-group">
                                     <label for="">Plan</label>
-                                    <textarea class="form-control" id="plan" name="plan" rows="3" required></textarea>
+                                    <textarea class="form-control" id="plan" name="plan" rows="3"
+                                        placeholder="Prescribed medicine or the Doctor's plan for the patient"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -234,32 +255,61 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Weight</label>
-                                            <input type="nutextmber" class="form-control" id="weight" name="weight"
-                                                required>
+                                            <label for="weight">Weight</label><span
+                                                style="color: red; font-size: 22px;">*</span>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="weight" name="weight"
+                                                    required>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">kg</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
+
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Blood Pressure</label>
-                                            <input type="text" class="form-control" id="bp" name="bp" required>
+                                            <label for="bp">Blood Pressure</label><span
+                                                style="color: red; font-size: 22px;">*</span>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="bp" name="bp" required>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">mmHg</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
                                 </div>
 
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Height</label>
-                                            <input type="text" class="form-control" id="height" name="height" required>
+                                            <label for="height">Height</label><span
+                                                style="color: red; font-size: 22px;">*</span>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="height" name="height"
+                                                    required>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">cm</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
+
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Pulse Rate</label>
-                                            <input type="text" class="form-control" id="pulse" name="pulse" required>
+                                            <label for="pulse">Pulse Rate</label><span
+                                                style="color: red; font-size: 22px;">*</span>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="pulse" name="pulse"
+                                                    required>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">bpm</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -268,7 +318,8 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Skin</label>
+                                            <label for="">Skin</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="normalSkinRadio" name="skin" value="Normal"
@@ -299,7 +350,8 @@ if ($result === false) {
 
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Extremities</label>
+                                            <label for="">Extremities</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="normalRadio" name="extremities" value="Normal"
@@ -328,7 +380,8 @@ if ($result === false) {
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Conjunctiva</label>
+                                            <label for="">Conjunctiva</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="normalConjunctivaRadio" name="conjunctiva"
@@ -353,7 +406,8 @@ if ($result === false) {
 
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="">Neck</label>
+                                            <label for="">Neck</label><span
+                                                style="color: red; font-size: 22px;">*</span>
                                             <br>
                                             <div style="display: inline-block;" class="mt-1">
                                                 <input type="radio" id="normalNeckRadio" name="neck" value="Normal"
@@ -484,6 +538,7 @@ if ($result === false) {
             </div>
         </div>
     </div>
+
     <script>
         // Add an event listener to the Save button
         document.getElementById('addButton').addEventListener('click', function () {
@@ -501,7 +556,24 @@ if ($result === false) {
                 }
             }
         });
+    </script>
+    <script>
+        // Add an event listener to the Save button
+        document.getElementById('addButton').addEventListener('click', function () {
+            // Assuming you have a variable `completedStep` that holds the completed step value, e.g., "Step1", "Step2", etc.
+            var completedStep = "Pending"; // Example completed step
 
+            // Get the select element
+            var selectStep = document.getElementById('status');
+
+            // Loop through options and set selected attribute if value matches completedStep
+            for (var i = 0; i < selectStep.options.length; i++) {
+                if (selectStep.options[i].value === completedStep) {
+                    selectStep.options[i].setAttribute('selected', 'selected');
+                    break; // Exit loop once selected option is found
+                }
+            }
+        });
     </script>
     <style>
         .tago {
@@ -515,15 +587,15 @@ if ($result === false) {
                     <thead class="thead-light">
                         <tr>
                             <th class="tago">No.</th>
-                            <th>Serial Number</th>
+                            <th>Family Number</th>
                             <th>Patient Name</th>
-                            <th>Subjective</th>
-                            <th>Objective</th>
-                            <th>Assessment</th>
-                            <th>Plan</th>
+                            <th>Skin</th>
+                            <th>Extremities</th>
+                            <th>Neck</th>
+                            <th>Conjunctiva</th>
                             <th>Date</th>
                             <th>Status</th>
-                            <th>Process</th>
+                            <th>Progress</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -544,16 +616,16 @@ if ($result === false) {
                                         <?php echo $row['full_name']; ?>
                                     </td>
                                     <td class="align-middle">
-                                        <?php echo $row['subjective']; ?>
+                                        <?php echo $row['skin']; ?>
                                     </td>
                                     <td class="align-middle">
-                                        <?php echo $row['objective']; ?>
+                                        <?php echo $row['extremities']; ?>
                                     </td>
                                     <td class="align-middle">
-                                        <?php echo $row['assessment']; ?>
+                                        <?php echo $row['neck']; ?>
                                     </td>
                                     <td class="align-middle">
-                                        <?php echo $row['plan']; ?>
+                                        <?php echo $row['conjunctiva']; ?>
                                     </td>
                                     <td class="align-middle">
                                         <?php echo $row['checkup_date']; ?>
@@ -562,7 +634,7 @@ if ($result === false) {
                                         <?php echo $row['status']; ?>
                                     </td>
                                     <td class="align-middle">
-                                        <?php echo $row['step']; ?>
+                                        <?php echo $row['steps']; ?>
                                     </td>
                                     <td class="align-middle">
                                         <button type="button" class="btn btn-success editbtn"
@@ -654,12 +726,12 @@ if ($result === false) {
                                 </div>
 
                             </div>
-                            <div class="col-4">
+                            <div class="col-sm">
                                 <div class="form-group">
                                     <label for="">Select Status</label>
                                     <select class="form-control" name="status2" id="status2" required>
                                         <option value="" disabled selected hidden>Select a Status</option>
-                                        <!-- <option value="Complete">Complete</option> -->
+                                        <option value="Complete">Complete</option>
                                         <option value="Pending">Pending</option>
                                         <option value="Progress">Progress</option>
                                     </select>
@@ -673,13 +745,68 @@ if ($result === false) {
                                         required>
                                 </div>
                             </div>
+
+                        </div>
+                        <div class="row">
+                            <!-- <div class="col-4">
+                                <div class="form-group">
+                                    <label for="patient">Patient Name</label>
+                                    <input list="patients" class="form-control" name="patient_name" id="patient_name"
+                                        disabled>
+                                    <datalist id="patients">
+                                        <?php
+                                        // Query to fetch patients from the database who are not deleted
+                                        $sql2 = "SELECT serial_no, first_name, last_name FROM patients WHERE is_deleted = 0 ORDER BY id DESC";
+                                        $result2 = $conn->query($sql2);
+
+                                        if ($result2->num_rows > 0) {
+                                            while ($row2 = $result2->fetch_assoc()) {
+                                                $patientSerialNo = $row2['serial_no'];
+                                                $firstName = $row2['first_name'];
+                                                $lastName = $row2['last_name'];
+
+                                                // Output an option element for each patient with the serial_no as the value
+                                                echo "<option value='$patientSerialNo'>$firstName $lastName</option>";
+                                            }
+                                        } else {
+                                            echo "<option disabled>No patients found</option>";
+                                        }
+                                        ?>
+
+                                    </datalist>
+                                    <input type="hidden" name="serial_no" id="serial_no">
+
+
+                                </div>
+                            </div> -->
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Select Step</label>
+                                    <select class="form-control" name="steps2" id="steps2" required class="">
+                                        <option value="" disabled selected hidden>Select a Step</option>
+                                        <option value="Interview Staff">Interview Staff</option>
+                                        <option value="Consultation">Consultation</option>
+                                        <option value="Immunization">Immunization</option>
+                                        <option value="Prenatal">Prenatal</option>
+                                        <option value="Family Planning">Family Planning</option>
+                                        <option value="Doctor">Doctor</option>
+                                        <option value="Nurse">Nurse</option>
+                                        <option value="Midwife">Midwife</option>
+                                        <option value="Head Nurse">Head Nurse</option>
+                                        <option value="Prescription">Prescription</option>
+                                    </select>
+                                    <!-- <div id="editStatus_error" class="error"></div> -->
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-sm">
 
                                 <div class="form-group">
                                     <label for="">Subjective</label>
-                                    <textarea class="form-control" id="subjective2" name="subjective2" rows="3"
+                                    <textarea class="form-control" style="white-space: normal;" id="subjective2"
+                                        name="subjective2" rows="3"
+                                        placeholder="e.g., sakit ng tiyan (stomach pain), headache, patient's verbal report"
                                         required></textarea>
                                 </div>
                             </div>
@@ -688,7 +815,8 @@ if ($result === false) {
                                 <div class="form-group">
                                     <label for="">Objective</label>
                                     <textarea class="form-control" id="objective2" name="objective2" rows="3"
-                                        required></textarea>
+                                        placeholder="vital signs - temperature, pulse rate, bp, respiration.
+assessment: diagnosis" required></textarea>
                                 </div>
                             </div>
                             <div class="col-sm">
@@ -696,6 +824,7 @@ if ($result === false) {
                                 <div class="form-group">
                                     <label for="">Assessment</label>
                                     <textarea class="form-control" id="assessment2" name="assessment2" rows="3"
+                                        placeholder="Prescribed medicine or the Doctor's plan for the patient"
                                         required></textarea>
                                 </div>
                             </div>
@@ -963,7 +1092,7 @@ if ($result === false) {
                             var tomorrow = today.toISOString().split('T')[0];
 
                             // Set the minimum date for the input element
-                            document.getElementById('checkup_date').min = tomorrow;
+                            document.getElementById('checkup_date2').min = tomorrow;
                         </script>
 
 
@@ -1008,49 +1137,113 @@ if ($result === false) {
 
             <?php if ($result->num_rows > 0): ?>
                 var table = $('#tablebod').DataTable({
-                    columnDefs: [
-                        { targets: 0, data: 'id', visible: false },
-                        { targets: 1, data: 'serial_no' },
-                        { targets: 2, data: 'full_name' },
-                        { targets: 3, data: 'subjective' },
-                        { targets: 4, data: 'objective' },
-                        { targets: 5, data: 'assessment' },
-                        { targets: 6, data: 'plan' },
-                        { targets: 7, data: 'checkup_date' },
-                        { targets: 8, data: 'status' },
-                        { targets: 9, data: 'step' },
-                        {
-                            targets: 10,
-                            searchable: false,
-                            data: null,
-                            render: function (data, type, row) {
-                                var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
-                                var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="fas fa-user-times"></i> Inactive</button>';
-                                return editButton + ' ' + deleteButton;
+                    columnDefs: [{
+                        targets: 0,
+                        data: 'id',
+                        visible: false
+                    },
+                    {
+                        targets: 1,
+                        data: 'serial_no'
+                    },
+                    {
+                        targets: 2,
+                        data: 'full_name'
+                    },
+                    {
+                        targets: 3,
+                        data: 'skin'
+                    },
+                    {
+                        targets: 4,
+                        data: 'extremities'
+                    },
+                    {
+                        targets: 5,
+                        data: 'neck'
+                    },
+                    {
+                        targets: 6,
+                        data: 'conjunctiva'
+                    },
+                    {
+                        targets: 7,
+                        data: 'checkup_date'
+                    },
+                    {
+                        targets: 8,
+                        data: 'status'
+                    },
+                    {
+                        targets: 9,
+                        data: 'steps'
+                    },
+                    {
+                        targets: 10,
+                        searchable: false,
+                        data: null,
+                        render: function (data, type, row) {
+                            var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
+                            var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="fas fa-user-times"></i> Inactive</button>';
+                            return editButton + ' ' + deleteButton;
 
-                            }
-                        } // Action column
+                        }
+                    } // Action column
                     ],
                     // Set the default ordering to 'id' column in descending order
-                    order: [[0, 'desc']]
+                    order: [
+                        [0, 'desc']
+                    ]
                 });
             <?php else: ?>
                 // Initialize DataTable without the "Action" column when no rows are found
                 var table = $('#tablebod').DataTable({
-                    columnDefs: [
-                        { targets: 0, data: 'id', visible: false },
-                        { targets: 1, data: 'serial_no' },
-                        { targets: 2, data: 'full_name' },
-                        { targets: 3, data: 'subjective' },
-                        { targets: 4, data: 'objective' },
-                        { targets: 5, data: 'assessment' },
-                        { targets: 6, data: 'plan' },
-                        { targets: 7, data: 'checkup_date' },
-                        { targets: 8, data: 'status' },
-                        { targets: 9, data: 'step' },
+                    columnDefs: [{
+                        targets: 0,
+                        data: 'id',
+                        visible: false
+                    },
+                    {
+                        targets: 1,
+                        data: 'serial_no'
+                    },
+                    {
+                        targets: 2,
+                        data: 'full_name'
+                    },
+                    {
+                        targets: 3,
+                        data: 'skin'
+                    },
+                    {
+                        targets: 4,
+                        data: 'extremities'
+                    },
+                    {
+                        targets: 5,
+                        data: 'neck'
+                    },
+                    {
+                        targets: 6,
+                        data: 'conjunctiva'
+                    },
+                    {
+                        targets: 7,
+                        data: 'checkup_date'
+                    },
+                    {
+                        targets: 8,
+                        data: 'status'
+                    },
+                    {
+                        targets: 9,
+                        data: 'steps'
+                    },
                     ],
                     // Set the default ordering to 'id' column in descending order
-                    order: [[0, 'desc']]
+                    order: [
+                        [0, 'desc']
+                    ]
                 });
             <?php endif; ?>
 
@@ -1059,30 +1252,62 @@ if ($result === false) {
                 console.log(patient_id);
                 table.destroy(); // Destroy the existing DataTable
                 table = $('#tablebod').DataTable({
-                    columnDefs: [
-                        { targets: 0, data: 'id', visible: false },
-                        { targets: 1, data: 'serial_no' },
-                        { targets: 2, data: 'full_name' },
-                        { targets: 3, data: 'subjective' },
-                        { targets: 4, data: 'objective' },
-                        { targets: 5, data: 'assessment' },
-                        { targets: 6, data: 'plan' },
-                        { targets: 7, data: 'checkup_date' },
-                        { targets: 8, data: 'status' },
-                        { targets: 9, data: 'step' },
-                        {
-                            targets: 10,
-                            searchable: false,
-                            data: null,
-                            render: function (data, type, row) {
-                                var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
-                                var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="bi bi-person-dash"></i> Inactive</button>';
-                                return editButton + ' ' + deleteButton;
-                            }
-                        } // Action column
+                    columnDefs: [{
+                        targets: 0,
+                        data: 'id',
+                        visible: false
+                    },
+                    {
+                        targets: 1,
+                        data: 'serial_no'
+                    },
+                    {
+                        targets: 2,
+                        data: 'full_name'
+                    },
+                    {
+                        targets: 3,
+                        data: 'skin'
+                    },
+                    {
+                        targets: 4,
+                        data: 'extremities'
+                    },
+                    {
+                        targets: 5,
+                        data: 'neck'
+                    },
+                    {
+                        targets: 6,
+                        data: 'conjunctiva'
+                    },
+                    {
+                        targets: 7,
+                        data: 'checkup_date'
+                    },
+                    {
+                        targets: 8,
+                        data: 'status'
+                    },
+                    {
+                        targets: 9,
+                        data: 'steps'
+                    },
+                    {
+                        targets: 10,
+                        searchable: false,
+                        data: null,
+                        render: function (data, type, row) {
+                            var editButton = '<button type="button" class="btn btn-success editbtn" data-row-id="' + row.id + '"><i class="fas fa-edit"></i> Update</button>';
+                            var deleteButton = '<button type="button" class="btn btn-danger deletebtn" data-id="' + row.id + '"><i class="bi bi-person-dash"></i> Inactive</button>';
+                            return editButton + ' ' + deleteButton;
+                        }
+                    } // Action column
                     ],
                     // Set the default ordering to 'id' column in descending order
-                    order: [[0, 'desc']]
+                    order: [
+                        [0, 'desc']
+                    ]
                 });
 
                 // Get data from the form
@@ -1092,9 +1317,10 @@ if ($result === false) {
                 var objective = $('#objective').val();
                 var assessment = $('#assessment').val();
                 var plan = $('#plan').val();
-                // var checkup_date = $('#checkup_date').val();
+                var checkup_date = $('#checkup_date').val();
                 var doctor_id = $('#doctor_id').val();
                 var status = $('#status').val();
+                var steps = $('#step').val();
                 // 
                 var weight = $('#weight').val();
                 var bp = $('#bp').val();
@@ -1127,13 +1353,14 @@ if ($result === false) {
                     method: 'POST',
                     data: {
                         patient_id: patient_id,
+                        steps: steps,
                         subjective: subjective,
                         objective: objective,
                         assessment: assessment,
                         plan: plan,
                         doctor_id: doctor_id,
                         status: status,
-                        // checkup_date: checkup_date,
+                        checkup_date: checkup_date,
                         weight: weight,
                         bp: bp,
                         height: height,
@@ -1168,7 +1395,8 @@ if ($result === false) {
                             $('#plan').val('');
                             $('#doctor_id').val('');
                             $('#status').val('');
-                            // $('#checkup_date').val('');
+                            $('#checkup_date').val('');
+                            $('#step').val('');
 
                             updateData();
                             $('#addModal').modal('hide');
@@ -1241,7 +1469,9 @@ if ($result === false) {
                         $.ajax({
                             url: 'action/delete_consultation.php',
                             method: 'POST',
-                            data: { primary_id: deletedataId },
+                            data: {
+                                primary_id: deletedataId
+                            },
                             success: function (response) {
                                 if (response === 'Success') {
 
@@ -1266,7 +1496,9 @@ if ($result === false) {
                 $.ajax({
                     url: 'action/get_consultation_by_id.php', // 
                     method: 'POST',
-                    data: { primary_id: editId },
+                    data: {
+                        primary_id: editId
+                    },
                     success: function (data) {
 
                         var editGetData = data;
@@ -1274,6 +1506,7 @@ if ($result === false) {
                         console.log(editGetData.id);
                         $('#editModal #editdataId').val(editGetData.id);
                         $('#editModal #doctor_id2').val(editGetData.doctor_id);
+                        // $('#editModal #patient_name').val(editGetData.full_name);
                         $('#editModal #checkup_date2').val(editGetData.checkup_date);
                         $('#editModal #subjective2').val(editGetData.subjective);
                         $('#editModal #objective2').val(editGetData.objective);
@@ -1282,6 +1515,7 @@ if ($result === false) {
                         $('#editModal #weight2').val(editGetData.weight);
                         $('#editModal #bp2').val(editGetData.bp);
                         $('#editModal #status2').val(editGetData.status);
+                        $('#editModal #steps2').val(editGetData.steps);
 
                         $('#editModal #height2').val(editGetData.height);
                         $('#editModal #pulse2').val(editGetData.pulse);
@@ -1408,8 +1642,10 @@ if ($result === false) {
                 var assessment = $('#assessment2').val();
                 var plan = $('#plan2').val();
                 var doctor_id = $('#doctor_id2').val();
+                // var full_name = $('#patient_name').val();
                 var checkup_date = $('#checkup_date2').val();
                 var status = $('#status2').val();
+                var steps = $('#steps2').val();
 
                 var extremities = $('input[name="extremities2"]:checked').val()
                 var skin = $('input[name="skin2"]:checked').val();
@@ -1447,7 +1683,9 @@ if ($result === false) {
                         assessment: assessment,
                         plan: plan,
                         doctor_id: doctor_id,
+                        // patient_id: patient_id,
                         status: status,
+                        steps: steps,
                         checkup_date: checkup_date,
                         weight: weight,
                         bp: bp,
@@ -1509,8 +1747,6 @@ if ($result === false) {
 
 
         });
-
-
     </script>
     <script>
         // Set the timeout duration (in milliseconds)

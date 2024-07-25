@@ -4,6 +4,11 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "midwife") {
   header("Location: ../../{$_SESSION['role']}/dashboard/dashboard.php");
   exit;
 }
+
+
+if (!isset($_SESSION['role'])) {
+  header("location: ../../index.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -94,7 +99,39 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "midwife") {
           <?php
           include_once ('../../config.php');
 
-          // Check if user is logged in
+          // Check if the welcome speech has not been played yet
+          if (!isset($_SESSION['welcome_speech_played'])) {
+            // Check if user is logged in
+            if (isset($_SESSION['user_id'])) {
+              $user_id = $_SESSION['user_id'];
+
+              // Query to fetch user's name from admins table
+              $sel = "SELECT * FROM midwife WHERE user_id = $user_id";
+              $query = mysqli_query($conn, $sel);
+
+              if ($query) {
+                $result = mysqli_fetch_assoc($query);
+
+                if ($result) {
+                  // Single welcome voice speech with user's name
+                  echo '<script>';
+                  echo 'var welcomeMessage = "Welcome, ' . $result['first_name'] . ' ' . $result['last_name'] . '";';
+                  echo 'var utterance = new SpeechSynthesisUtterance(welcomeMessage);';
+                  echo 'speechSynthesis.speak(utterance);';
+                  echo '</script>';
+
+                  // Set session variable to indicate that the welcome speech has been played
+                  $_SESSION['welcome_speech_played'] = true;
+                } else {
+                  echo "No users found";
+                }
+              } else {
+                echo "Query failed: " . mysqli_error($conn);
+              }
+            }
+          }
+
+          // Display user information if logged in
           if (isset($_SESSION['user_id'])) {
             $user_id = $_SESSION['user_id'];
 
@@ -184,25 +221,25 @@ if (isset($_SESSION['role']) && $_SESSION['role'] !== "midwife") {
             </li> -->
 
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a href="../status/status.php" class="nav-link">
                 <i class="fas fa-vial fa-lg "></i>
                 <p>
                   Status
                 </p>
               </a>
-            </li>
+            </li> -->
 
 
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a href="../report/report.php" class="nav-link">
                 <i class="fa fa-book fa-lg "></i>
                 <p>
                   Report
                 </p>
               </a>
-            </li>
+            </li> -->
 
 
 

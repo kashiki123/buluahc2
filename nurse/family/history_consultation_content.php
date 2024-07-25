@@ -1,10 +1,10 @@
 <?php
 // Include your database configuration file
-include_once('../../config.php');
+include_once ('../../config.php');
 
 $user_id = $_GET['patient_id'];
 
-$sql = "SELECT *,fp_information.id as id,patients.first_name as first_name,patients.last_name as last_name,nurses.first_name as first_name2,nurses.last_name as last_name2
+$sql = "SELECT *,fp_information.id as id,CONCAT(patients.last_name,', ',patients.first_name) AS full_name,nurses.first_name as first_name2,nurses.last_name as last_name2
 FROM fp_information
 JOIN patients ON fp_information.patient_id = patients.id
 JOIN nurses ON fp_information.nurse_id = nurses.id
@@ -33,7 +33,8 @@ if ($result === false) {
     <br><br>
 
 
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -76,7 +77,7 @@ if ($result === false) {
                         <script>
                             // Add a JavaScript event listener to update the input field
                             const patientInput = document.getElementById('patient_id');
-                            patientInput.addEventListener('input', function() {
+                            patientInput.addEventListener('input', function () {
                                 const selectedOption = document.querySelector('datalist#patients option[value="' + this.value + '"]');
                                 if (selectedOption) {
                                     this.value = selectedOption.innerText; // Update the input text
@@ -111,14 +112,15 @@ if ($result === false) {
                                 }
 
                                 // Close the database connection
-
+                                
                                 ?>
                             </select>
 
                         </div>
                         <div class="form-group">
                             <label for="">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                            <textarea class="form-control" id="description" name="description" rows="3"
+                                required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="">Checkup Date</label>
@@ -143,7 +145,8 @@ if ($result === false) {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="closeModalButton">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        id="closeModalButton">Close</button>
                     <button type="submit" class="btn btn-primary" id="addButton">Save</button>
                 </div>
             </div>
@@ -157,7 +160,7 @@ if ($result === false) {
                     <thead class="thead-light">
                         <tr>
                             <th>ID</th>
-                            <th>Nurse Name</th>
+                            <th>Patient Name</th>
                             <th>Check-up Date</th>
                             <th>Description</th>
                             <th>Diagnosis</th>
@@ -172,18 +175,19 @@ if ($result === false) {
                             while ($row = $result->fetch_assoc()) {
                                 $checkup_date = $row['checkup_date'];
                                 $formatted_date = date('F j, Y', strtotime($checkup_date));
-                        ?>
+                                ?>
 
                                 <tr>
                                     <td class="align-middle"><?php echo $row['id']; ?></td>
-                                    <td class="align-middle"> <?php echo $row['last_name2']; ?></td>
+                                    <td class="align-middle"> <?php echo $row['full_name']; ?></td>
                                     <td class="align-middle"> <?php echo $formatted_date; ?></td>
                                     <td class="align-middle"><?php echo $row['description']; ?></td>
                                     <td class="align-middle"><?php echo $row['diagnosis']; ?></td>
                                     <td class="align-middle"><?php echo $row['medicine']; ?></td>
-                                    <td><button class="btn btn-primary" onclick="recordsBtn(<?php echo $row['id']; ?>)"><i class="fas fa-eye"> View History</i></button></td>
+                                    <td><button class="btn btn-primary" onclick="recordsBtn(<?php echo $row['id']; ?>)"><i
+                                                class="fas fa-eye"> View History</i></button></td>
                                 </tr>
-                            <?php
+                                <?php
                             }
                         } else {
                             ?>
@@ -196,7 +200,7 @@ if ($result === false) {
                                 <td class="align-middle"></td>
 
                             </tr>
-                        <?php
+                            <?php
                         }
                         ?>
                     </tbody>
@@ -207,7 +211,8 @@ if ($result === false) {
 
     <!-- modal edit -->
 
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -246,14 +251,15 @@ if ($result === false) {
                                 }
 
                                 // Close the database connection
-
+                                
                                 ?>
                             </select>
 
                         </div>
                         <div class="form-group">
                             <label for="">Description</label>
-                            <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
+                            <textarea class="form-control" id="editDescription" name="description" rows="3"
+                                required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="">Checkup Date</label>
@@ -446,14 +452,16 @@ if ($result === false) {
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="hematoma_bruising_gum_bleeding2"
-                                                        name="medical_condition" value="hematoma_bruising_gum_bleeding" disabled>
+                                                        name="medical_condition" value="hematoma_bruising_gum_bleeding"
+                                                        disabled>
                                                     <label class="checkbox-label">non-traumatic hematoma /
                                                         frequent
                                                         bruising or gum bleeding</label>
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="breast_cancer_breast_mass2"
-                                                        name="medical_condition" value="breast_cancer_breast_mass" disabled>
+                                                        name="medical_condition" value="breast_cancer_breast_mass"
+                                                        disabled>
                                                     <label class="checkbox-label">current or history of breast
                                                         cancer/breast mass</label>
                                                 </div>
@@ -464,7 +472,8 @@ if ($result === false) {
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="cough_more_than_14_days2"
-                                                        name="medical_condition" value="cough_more_than_14_days" disabled>
+                                                        name="medical_condition" value="cough_more_than_14_days"
+                                                        disabled>
                                                     <label class="checkbox-label">cough for more than 14
                                                         days</label>
                                                 </div>
@@ -495,7 +504,8 @@ if ($result === false) {
                                                 </div>
                                                 <div class="checkbox-item">
                                                     <input type="checkbox" id="phenobarbital_rifampicin2"
-                                                        name="medical_condition" value="phenobarbital_rifampicin" disabled>
+                                                        name="medical_condition" value="phenobarbital_rifampicin"
+                                                        disabled>
                                                     <label class="checkbox-label">intake of phenobarbital
                                                         (anti-seizure)
                                                         or rifampicin (anti-TB)</label>
@@ -670,14 +680,16 @@ if ($result === false) {
                                         <div class="checkbox-list">
                                             <div class="checkbox-item">
                                                 <input type="checkbox" id="unpleasant_relationship2"
-                                                    name="unpleasant_relationship2" value="unpleasant_relationship" disabled>
+                                                    name="unpleasant_relationship2" value="unpleasant_relationship"
+                                                    disabled>
                                                 <label class="checkbox-label">Create an unpleasant relationship
                                                     with
                                                     partner</label>
                                             </div>
                                             <div class="checkbox-item">
                                                 <input type="checkbox" id="partner_does_not_approve2"
-                                                    name="partner_does_not_approve2" value="partner_does_not_approve" disabled>
+                                                    name="partner_does_not_approve2" value="partner_does_not_approve"
+                                                    disabled>
                                                 <label class="checkbox-label">Partner does not approve of the
                                                     visit to
                                                     FP clinic</label>
@@ -709,33 +721,58 @@ if ($result === false) {
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Weight</label>
-                                        <input type="nutextmber" class="form-control" id="weight2" name="weight2"
-                                            disabled>
+                                        <label for="weight2">Weight</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="weight2" name="weight2"
+                                                disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">kg</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
 
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Blood Pressure</label>
-                                        <input type="text" class="form-control" id="bp2" name="bp2" disabled>
+                                        <label for="bp2">Blood Pressure</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="bp2" name="bp2" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">bp</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Height</label>
-                                        <input type="text" class="form-control" id="height2" name="height2" disabled>
+                                        <label for="height2">Height</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="height2" name="height2"
+                                                disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">cm</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
 
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="">Pulse Rate</label>
-                                        <input type="text" class="form-control" id="pulse2" name="pulse2" disabled>
+                                        <label for="pulse2">Pulse Rate</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="pulse2" name="pulse2" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">bpm</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
 
                             </div>
@@ -920,62 +957,62 @@ if ($result === false) {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
 
 
 
 
-        <?php if ($result->num_rows > 0) : ?>
+        <?php if ($result->num_rows > 0): ?>
             var table = $('#tablebod').DataTable({
                 columnDefs: [{
-                        targets: 0,
-                        data: 'id'
-                    },
-                    {
-                        targets: 1,
-                        data: 'last_name'
-                    },
-                    {
-                        targets: 2,
-                        data: 'description'
-                    },
-                    {
-                        targets: 3,
-                        data: 'diagnosis'
-                    },
-                    {
-                        targets: 4,
-                        data: 'medicine'
-                    },
+                    targets: 0,
+                    data: 'id'
+                },
+                {
+                    targets: 1,
+                    data: 'full_name'
+                },
+                {
+                    targets: 2,
+                    data: 'description'
+                },
+                {
+                    targets: 3,
+                    data: 'diagnosis'
+                },
+                {
+                    targets: 4,
+                    data: 'medicine'
+                },
                 ],
                 // Set the default ordering to 'id' column in descending order
                 order: [
                     [0, 'desc']
                 ]
             });
-        <?php else : ?>
+        <?php else: ?>
             // Initialize DataTable without the "Action" column when no rows are found
             var table = $('#tablebod').DataTable({
                 columnDefs: [{
-                        targets: 0,
-                        data: 'id'
-                    },
-                    {
-                        targets: 1,
-                        data: 'last_name'
-                    },
-                    {
-                        targets: 2,
-                        data: 'description'
-                    },
-                    {
-                        targets: 3,
-                        data: 'diagnosis'
-                    },
-                    {
-                        targets: 4,
-                        data: 'medicine'
-                    },
+                    targets: 0,
+                    data: 'id'
+                },
+                {
+                    targets: 1,
+                    data: 'full_name'
+                },
+                {
+                    targets: 2,
+                    data: 'description'
+                },
+                {
+                    targets: 3,
+                    data: 'diagnosis'
+                },
+                {
+                    targets: 4,
+                    data: 'medicine'
+                },
                 ],
                 // Set the default ordering to 'id' column in descending order
                 order: [
@@ -984,31 +1021,31 @@ if ($result === false) {
             });
         <?php endif; ?>
 
-        $('#addButton').click(function() {
+        $('#addButton').click(function () {
 
             console.log(patient_id);
             table.destroy(); // Destroy the existing DataTable
             table = $('#tablebod').DataTable({
                 columnDefs: [{
-                        targets: 0,
-                        data: 'id'
-                    },
-                    {
-                        targets: 1,
-                        data: 'last_name'
-                    },
-                    {
-                        targets: 2,
-                        data: 'description'
-                    },
-                    {
-                        targets: 3,
-                        data: 'diagnosis'
-                    },
-                    {
-                        targets: 4,
-                        data: 'medicine'
-                    },
+                    targets: 0,
+                    data: 'id'
+                },
+                {
+                    targets: 1,
+                    data: 'full_name'
+                },
+                {
+                    targets: 2,
+                    data: 'description'
+                },
+                {
+                    targets: 3,
+                    data: 'diagnosis'
+                },
+                {
+                    targets: 4,
+                    data: 'medicine'
+                },
                 ],
                 // Set the default ordering to 'id' column in descending order
                 order: [
@@ -1035,7 +1072,7 @@ if ($result === false) {
                     doctor_id: doctor_id,
                     checkup_date: checkup_date,
                 },
-                success: function(response) {
+                success: function (response) {
 
                     if (response.trim() === 'Success') {
 
@@ -1068,7 +1105,7 @@ if ($result === false) {
                         });
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     // Handle errors
                     Swal.fire({
                         icon: 'error',
@@ -1085,14 +1122,14 @@ if ($result === false) {
             $.ajax({
                 url: 'action/get_active.php',
                 method: 'GET',
-                success: function(data) {
+                success: function (data) {
                     // Assuming the server returns JSON data, parse it
                     var get_data = JSON.parse(data);
 
                     // Clear the DataTable and redraw with new data
                     table.clear().rows.add(get_data).draw();
                 },
-                error: function(error) {
+                error: function (error) {
                     // Handle errors
                     console.error('Error retrieving data: ' + error);
                 }
@@ -1100,7 +1137,7 @@ if ($result === false) {
         }
 
         // Delete button click event
-        $('#tablebod').on('click', '.deletebtn', function() {
+        $('#tablebod').on('click', '.deletebtn', function () {
             var deletedataId = $(this).data('id');
 
             // Confirm the deletion with a SweetAlert dialog
@@ -1120,7 +1157,7 @@ if ($result === false) {
                         data: {
                             primary_id: deletedataId
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response === 'Success') {
 
                                 updateData();
@@ -1129,7 +1166,7 @@ if ($result === false) {
                                 Swal.fire('Error', 'Error deleting data: ' + response, 'error');
                             }
                         },
-                        error: function(error) {
+                        error: function (error) {
                             Swal.fire('Error', 'Error deleting data: ' + error, 'error');
                         }
                     });
@@ -1140,7 +1177,7 @@ if ($result === false) {
 
 
         // Edit button click event
-        $('#tablebod').on('click', '.editbtn', function() {
+        $('#tablebod').on('click', '.editbtn', function () {
             var editId = $(this).data('row-id');
             console.log(editId);
             $.ajax({
@@ -1149,7 +1186,7 @@ if ($result === false) {
                 data: {
                     primary_id: editId
                 },
-                success: function(data) {
+                success: function (data) {
 
                     var editGetData = data;
 
@@ -1161,13 +1198,13 @@ if ($result === false) {
 
                     $('#editModal').modal('show');
                 },
-                error: function(error) {
+                error: function (error) {
                     console.error('Error fetching  data: ' + error);
                 },
             });
         });
 
-        $('#updateButton').click(function() {
+        $('#updateButton').click(function () {
 
 
             var editId = $('#editdataId').val();
@@ -1184,7 +1221,7 @@ if ($result === false) {
                     doctor_id: doctor_id,
                     checkup_date: checkup_date,
                 },
-                success: function(response) {
+                success: function (response) {
                     // Handle the response
                     if (response === 'Success') {
                         updateData();
@@ -1207,7 +1244,7 @@ if ($result === false) {
                         });
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     // Show an error Swal notification for AJAX errors
                     Swal.fire({
                         icon: 'error',
@@ -1248,286 +1285,282 @@ if ($result === false) {
 </script>
 
 <script>
+    function recordsBtn(Keydata) {
+        console.log(Keydata);
+        $.ajax({
+            url: 'action/get_family_by_id.php',
+            method: 'POST',
+            data: {
+                primary_id: Keydata
+            },
+            success: function (data) {
 
-function recordsBtn(Keydata) {
-    console.log(Keydata);
-    $.ajax({
-        url: 'action/get_family_by_id.php',
-        method: 'POST',
-        data: {
-            primary_id: Keydata
-        },
-        success: function (data) {
+                var editGetData = data;
 
-            var editGetData = data;
+                console.log(editGetData);
 
-            console.log(editGetData);
-
-            $('#editModal2 #editdataId1').val(editGetData.id);
-            $('#editModal2 #no_of_children2').val(editGetData.no_of_children);
-            $('#editModal2 #income2').val(editGetData.income);
-            $('#editModal2 #nurse_id2').val(editGetData.nurse_id);
-            $('#editModal2 #editstatus').val(editGetData.status);
-            $('#editModal2 #no_of_pregnancies2').val(editGetData.no_of_pregnancies);
-            $('#editModal2 #date_of_last_delivery2').val(editGetData.date_of_last_delivery);
-            $('#editModal2 #last_period2').val(editGetData.last_period);
-
-
-            // Assuming editGetData.plan_to_have_more_children contains the value "Yes" or "No"
-            if (editGetData.plan_to_have_more_children === "Yes") {
-                $('#plan_to_have_more_children_yes').prop('checked', true);
-            } else if (editGetData.plan_to_have_more_children === "No") {
-                $('#plan_to_have_more_children_no').prop('checked', true);
-            }
-
-            // Assuming editGetData.client_type contains the value like "New Acceptor", "Changing Method", etc.
-            if (editGetData.client_type === "New Acceptor") {
-                $('#client_type_new').prop('checked', true);
-            } else if (editGetData.client_type === "Changing Method") {
-                $('#client_type_change').prop('checked', true);
-            } else if (editGetData.client_type === "Changing Clinic") {
-                $('#client_type_change_clinic').prop('checked', true);
-            } else if (editGetData.client_type === "Dropout/Restart") {
-                $('#client_type_dropout_restart').prop('checked', true);
-            }
-
-            // Assuming editGetData.reason_for_fp contains the value like "spacing" or "limiting"
-            if (editGetData.reason_for_fp === "spacing") {
-                $('#reason_for_fp_spacing').prop('checked', true);
-            } else if (editGetData.reason_for_fp === "limiting") {
-                $('#reason_for_fp_limiting').prop('checked', true);
-            }
+                $('#editModal2 #editdataId1').val(editGetData.id);
+                $('#editModal2 #no_of_children2').val(editGetData.no_of_children);
+                $('#editModal2 #income2').val(editGetData.income);
+                $('#editModal2 #nurse_id2').val(editGetData.nurse_id);
+                $('#editModal2 #editstatus').val(editGetData.status);
+                $('#editModal2 #no_of_pregnancies2').val(editGetData.no_of_pregnancies);
+                $('#editModal2 #date_of_last_delivery2').val(editGetData.date_of_last_delivery);
+                $('#editModal2 #last_period2').val(editGetData.last_period);
 
 
-            if (editGetData.severe_headaches === 'Yes') {
-                $('#severe_headaches2').prop('checked', true);
-            } else {
-                $('#severe_headaches2').prop('checked', false);
-            }
+                // Assuming editGetData.plan_to_have_more_children contains the value "Yes" or "No"
+                if (editGetData.plan_to_have_more_children === "Yes") {
+                    $('#plan_to_have_more_children_yes').prop('checked', true);
+                } else if (editGetData.plan_to_have_more_children === "No") {
+                    $('#plan_to_have_more_children_no').prop('checked', true);
+                }
 
-            if (editGetData.history_stroke_heart_attack_hypertension === 'Yes') {
-                $('#history_stroke_heart_attack_hypertension2').prop('checked', true);
-            } else {
-                $('#history_stroke_heart_attack_hypertension2').prop('checked', false);
-            }
+                // Assuming editGetData.client_type contains the value like "New Acceptor", "Changing Method", etc.
+                if (editGetData.client_type === "New Acceptor") {
+                    $('#client_type_new').prop('checked', true);
+                } else if (editGetData.client_type === "Changing Method") {
+                    $('#client_type_change').prop('checked', true);
+                } else if (editGetData.client_type === "Changing Clinic") {
+                    $('#client_type_change_clinic').prop('checked', true);
+                } else if (editGetData.client_type === "Dropout/Restart") {
+                    $('#client_type_dropout_restart').prop('checked', true);
+                }
 
-            if (editGetData.hematoma_bruising_gum_bleeding === 'Yes') {
-                $('#hematoma_bruising_gum_bleeding2').prop('checked', true);
-            } else {
-                $('#hematoma_bruising_gum_bleeding2').prop('checked', false);
-            }
-
-            if (editGetData.breast_cancer_breast_mass === 'Yes') {
-                $('#breast_cancer_breast_mass2').prop('checked', true);
-            } else {
-                $('#breast_cancer_breast_mass2').prop('checked', false);
-            }
-
-            if (editGetData.severe_chest_pain === 'Yes') {
-                $('#severe_chest_pain2').prop('checked', true);
-            } else {
-                $('#severe_chest_pain2').prop('checked', false);
-            }
-
-            if (editGetData.cough_more_than_14_days === 'Yes') {
-                $('#cough_more_than_14_days2').prop('checked', true);
-            } else {
-                $('#cough_more_than_14_days2').prop('checked', false);
-            }
-
-            if (editGetData.jaundice === 'Yes') {
-                $('#jaundice2').prop('checked', true);
-            } else {
-                $('#jaundice2').prop('checked', false);
-            }
-
-            if (editGetData.vaginal_bleeding === 'Yes') {
-                $('#vaginal_bleeding2').prop('checked', true);
-            } else {
-                $('#vaginal_bleeding2').prop('checked', false);
-            }
-
-            if (editGetData.vaginal_discharge === 'Yes') {
-                $('#vaginal_discharge2').prop('checked', true);
-            } else {
-                $('#vaginal_discharge2').prop('checked', false);
-            }
-
-            if (editGetData.phenobarbital_rifampicin === 'Yes') {
-                $('#phenobarbital_rifampicin2').prop('checked', true);
-            } else {
-                $('#phenobarbital_rifampicin2').prop('checked', false);
-            }
-
-            if (editGetData.smoker === 'Yes') {
-                $('#smoker2').prop('checked', true);
-            } else {
-                $('#smoker2').prop('checked', false);
-            }
-
-            if (editGetData.with_disability === 'Yes') {
-                $('#with_disability2').prop('checked', true);
-            } else {
-                $('#with_disability2').prop('checked', false);
-            }
-
-            // Check the appropriate radio button based on the value
-            if (editGetData.type_of_last_delivery === "Vaginal") {
-                $('#vaginalRadio').prop('checked', true);
-            } else if (editGetData.type_of_last_delivery === "Cesarean Section") {
-                $('#cesareanRadio').prop('checked', true);
-            }
+                // Assuming editGetData.reason_for_fp contains the value like "spacing" or "limiting"
+                if (editGetData.reason_for_fp === "spacing") {
+                    $('#reason_for_fp_spacing').prop('checked', true);
+                } else if (editGetData.reason_for_fp === "limiting") {
+                    $('#reason_for_fp_limiting').prop('checked', true);
+                }
 
 
-            if (editGetData.mens_type === "Scanty") {
-                $('#scantyRadio').prop('checked', true);
-            } else if (editGetData.mens_type === "Moderate") {
-                $('#moderateRadio').prop('checked', true);
-            } else if (editGetData.mens_type === "Heavy") {
-                $('#heavyRadio').prop('checked', true);
-            }
+                if (editGetData.severe_headaches === 'Yes') {
+                    $('#severe_headaches2').prop('checked', true);
+                } else {
+                    $('#severe_headaches2').prop('checked', false);
+                }
 
-            if (editGetData.abnormal_discharge === 'Yes') {
-                $('#abnormal_discharge2').prop('checked', true);
-            } else {
-                $('#abnormal_discharge2').prop('checked', false);
-            }
+                if (editGetData.history_stroke_heart_attack_hypertension === 'Yes') {
+                    $('#history_stroke_heart_attack_hypertension2').prop('checked', true);
+                } else {
+                    $('#history_stroke_heart_attack_hypertension2').prop('checked', false);
+                }
 
-            if (editGetData.genital_sores_ulcers === 'Yes') {
-                $('#genital_sores_ulcers2').prop('checked', true);
-            } else {
-                $('#genital_sores_ulcers2').prop('checked', false);
-            }
+                if (editGetData.hematoma_bruising_gum_bleeding === 'Yes') {
+                    $('#hematoma_bruising_gum_bleeding2').prop('checked', true);
+                } else {
+                    $('#hematoma_bruising_gum_bleeding2').prop('checked', false);
+                }
 
-            if (editGetData.genital_pain_burning_sensation === 'Yes') {
-                $('#genital_pain_burning_sensation2').prop('checked', true);
-            } else {
-                $('#genital_pain_burning_sensation2').prop('checked', false);
-            }
+                if (editGetData.breast_cancer_breast_mass === 'Yes') {
+                    $('#breast_cancer_breast_mass2').prop('checked', true);
+                } else {
+                    $('#breast_cancer_breast_mass2').prop('checked', false);
+                }
 
+                if (editGetData.severe_chest_pain === 'Yes') {
+                    $('#severe_chest_pain2').prop('checked', true);
+                } else {
+                    $('#severe_chest_pain2').prop('checked', false);
+                }
 
-            if (editGetData.treatment_for_sti === 'Yes') {
-                $('#treatment_for_sti2').prop('checked', true);
-            } else {
-                $('#treatment_for_sti2').prop('checked', false);
-            }
+                if (editGetData.cough_more_than_14_days === 'Yes') {
+                    $('#cough_more_than_14_days2').prop('checked', true);
+                } else {
+                    $('#cough_more_than_14_days2').prop('checked', false);
+                }
 
-            if (editGetData.hiv_aids_pid === 'Yes') {
-                $('#hiv_aids_pid2').prop('checked', true);
-            } else {
-                $('#hiv_aids_pid2').prop('checked', false);
-            }
+                if (editGetData.jaundice === 'Yes') {
+                    $('#jaundice2').prop('checked', true);
+                } else {
+                    $('#jaundice2').prop('checked', false);
+                }
 
-            if (editGetData.treatment_for_sti === 'Yes') {
-                $('#treatment_for_sti2').prop('checked', true);
-            } else {
-                $('#treatment_for_sti2').prop('checked', false);
-            }
+                if (editGetData.vaginal_bleeding === 'Yes') {
+                    $('#vaginal_bleeding2').prop('checked', true);
+                } else {
+                    $('#vaginal_bleeding2').prop('checked', false);
+                }
 
-            if (editGetData.hiv_aids_pid === 'Yes') {
-                $('#hiv_aids_pid2').prop('checked', true);
-            } else {
-                $('#hiv_aids_pid2').prop('checked', false);
-            }
+                if (editGetData.vaginal_discharge === 'Yes') {
+                    $('#vaginal_discharge2').prop('checked', true);
+                } else {
+                    $('#vaginal_discharge2').prop('checked', false);
+                }
 
+                if (editGetData.phenobarbital_rifampicin === 'Yes') {
+                    $('#phenobarbital_rifampicin2').prop('checked', true);
+                } else {
+                    $('#phenobarbital_rifampicin2').prop('checked', false);
+                }
 
-            if (editGetData.unpleasant_relationship === 'Yes') {
-                $('#unpleasant_relationship2').prop('checked', true);
-            } else {
-                $('#unpleasant_relationship2').prop('checked', false);
-            }
+                if (editGetData.smoker === 'Yes') {
+                    $('#smoker2').prop('checked', true);
+                } else {
+                    $('#smoker2').prop('checked', false);
+                }
 
-            if (editGetData.partner_does_not_approve === 'Yes') {
-                $('#partner_does_not_approve2').prop('checked', true);
-            } else {
-                $('#partner_does_not_approve2').prop('checked', false);
-            }
+                if (editGetData.with_disability === 'Yes') {
+                    $('#with_disability2').prop('checked', true);
+                } else {
+                    $('#with_disability2').prop('checked', false);
+                }
 
-            if (editGetData.domestic_violence === 'Yes') {
-                $('#domestic_violence2').prop('checked', true);
-            } else {
-                $('#domestic_violence2').prop('checked', false);
-            }
-
-
-            $('#editModal #weight2').val(editGetData.weight);
-            $('#editModal #bp2').val(editGetData.bp);
-            $('#editModal #height2').val(editGetData.height);
-            $('#editModal #pulse2').val(editGetData.pulse);
-
-            // Check the appropriate radio button based on the value
-            if (editGetData.extremities === "Normal") {
-                $('#normalRadio').prop('checked', true);
-            } else if (editGetData.extremities === "Edema") {
-                $('#edemaRadio').prop('checked', true);
-            } else if (editGetData.extremities === "Varicosities") {
-                $('#varicositiesRadio').prop('checked', true);
-            }
+                // Check the appropriate radio button based on the value
+                if (editGetData.type_of_last_delivery === "Vaginal") {
+                    $('#vaginalRadio').prop('checked', true);
+                } else if (editGetData.type_of_last_delivery === "Cesarean Section") {
+                    $('#cesareanRadio').prop('checked', true);
+                }
 
 
+                if (editGetData.mens_type === "Scanty") {
+                    $('#scantyRadio').prop('checked', true);
+                } else if (editGetData.mens_type === "Moderate") {
+                    $('#moderateRadio').prop('checked', true);
+                } else if (editGetData.mens_type === "Heavy") {
+                    $('#heavyRadio').prop('checked', true);
+                }
 
-            // Check the appropriate radio button based on the value
-            if (editGetData.skin === "Normal") {
-                $('#normalSkinRadio').prop('checked', true);
-            } else if (editGetData.skin === "Pale") {
-                $('#paleSkinRadio').prop('checked', true);
-            } else if (editGetData.skin === "Yellowish") {
-                $('#yellowishSkinRadio').prop('checked', true);
-            } else if (editGetData.skin === "Hematoma") {
-                $('#hematomaSkinRadio').prop('checked', true);
-            }
+                if (editGetData.abnormal_discharge === 'Yes') {
+                    $('#abnormal_discharge2').prop('checked', true);
+                } else {
+                    $('#abnormal_discharge2').prop('checked', false);
+                }
+
+                if (editGetData.genital_sores_ulcers === 'Yes') {
+                    $('#genital_sores_ulcers2').prop('checked', true);
+                } else {
+                    $('#genital_sores_ulcers2').prop('checked', false);
+                }
+
+                if (editGetData.genital_pain_burning_sensation === 'Yes') {
+                    $('#genital_pain_burning_sensation2').prop('checked', true);
+                } else {
+                    $('#genital_pain_burning_sensation2').prop('checked', false);
+                }
+
+
+                if (editGetData.treatment_for_sti === 'Yes') {
+                    $('#treatment_for_sti2').prop('checked', true);
+                } else {
+                    $('#treatment_for_sti2').prop('checked', false);
+                }
+
+                if (editGetData.hiv_aids_pid === 'Yes') {
+                    $('#hiv_aids_pid2').prop('checked', true);
+                } else {
+                    $('#hiv_aids_pid2').prop('checked', false);
+                }
+
+                if (editGetData.treatment_for_sti === 'Yes') {
+                    $('#treatment_for_sti2').prop('checked', true);
+                } else {
+                    $('#treatment_for_sti2').prop('checked', false);
+                }
+
+                if (editGetData.hiv_aids_pid === 'Yes') {
+                    $('#hiv_aids_pid2').prop('checked', true);
+                } else {
+                    $('#hiv_aids_pid2').prop('checked', false);
+                }
+
+
+                if (editGetData.unpleasant_relationship === 'Yes') {
+                    $('#unpleasant_relationship2').prop('checked', true);
+                } else {
+                    $('#unpleasant_relationship2').prop('checked', false);
+                }
+
+                if (editGetData.partner_does_not_approve === 'Yes') {
+                    $('#partner_does_not_approve2').prop('checked', true);
+                } else {
+                    $('#partner_does_not_approve2').prop('checked', false);
+                }
+
+                if (editGetData.domestic_violence === 'Yes') {
+                    $('#domestic_violence2').prop('checked', true);
+                } else {
+                    $('#domestic_violence2').prop('checked', false);
+                }
+
+
+                $('#editModal2 #weight2').val(editGetData.weight);
+                $('#editModal2 #bp2').val(editGetData.bp);
+                $('#editModal2 #height2').val(editGetData.height);
+                $('#editModal2 #pulse2').val(editGetData.pulse);
+
+                // Check the appropriate radio button based on the value
+                if (editGetData.extremities === "Normal") {
+                    $('#normalRadio').prop('checked', true);
+                } else if (editGetData.extremities === "Edema") {
+                    $('#edemaRadio').prop('checked', true);
+                } else if (editGetData.extremities === "Varicosities") {
+                    $('#varicositiesRadio').prop('checked', true);
+                }
 
 
 
-
-            // Check the appropriate radio button based on the value
-            if (editGetData.conjunctiva === "Normal") {
-                $('#normalConjunctivaRadio').prop('checked', true);
-            } else if (editGetData.conjunctiva === "Pale") {
-                $('#paleConjunctivaRadio').prop('checked', true);
-            } else if (editGetData.conjunctiva === "Yellowish") {
-                $('#yellowishConjunctivaRadio').prop('checked', true);
-            }
+                // Check the appropriate radio button based on the value
+                if (editGetData.skin === "Normal") {
+                    $('#normalSkinRadio').prop('checked', true);
+                } else if (editGetData.skin === "Pale") {
+                    $('#paleSkinRadio').prop('checked', true);
+                } else if (editGetData.skin === "Yellowish") {
+                    $('#yellowishSkinRadio').prop('checked', true);
+                } else if (editGetData.skin === "Hematoma") {
+                    $('#hematomaSkinRadio').prop('checked', true);
+                }
 
 
 
 
-            // Check the appropriate radio button based on the value
-            if (editGetData.neck === "Normal") {
-                $('#normalNeckRadio').prop('checked', true);
-            } else if (editGetData.neck === "Enlarge Lymph Nodes") {
-                $('#enlargeLymphNodesRadio').prop('checked', true);
-            }
+                // Check the appropriate radio button based on the value
+                if (editGetData.conjunctiva === "Normal") {
+                    $('#normalConjunctivaRadio').prop('checked', true);
+                } else if (editGetData.conjunctiva === "Pale") {
+                    $('#paleConjunctivaRadio').prop('checked', true);
+                } else if (editGetData.conjunctiva === "Yellowish") {
+                    $('#yellowishConjunctivaRadio').prop('checked', true);
+                }
 
 
 
-            // Check the appropriate radio button based on the value
-            if (editGetData.breast === "Normal") {
-                $('#normalBreastRadio').prop('checked', true);
-            } else if (editGetData.breast === "Mass") {
-                $('#massBreastRadio').prop('checked', true);
-            } else if (editGetData.breast === "Nipple Discharge") {
-                $('#nippleDischargeBreastRadio').prop('checked', true);
-            }
+
+                // Check the appropriate radio button based on the value
+                if (editGetData.neck === "Normal") {
+                    $('#normalNeckRadio').prop('checked', true);
+                } else if (editGetData.neck === "Enlarge Lymph Nodes") {
+                    $('#enlargeLymphNodesRadio').prop('checked', true);
+                }
 
 
 
-            // Check the appropriate radio button based on the value
-            if (editGetData.abdomen === "Normal") {
-                $('#normalAbdomenRadio').prop('checked', true);
-            } else if (editGetData.abdomen === "Abdominal Mass") {
-                $('#abdominalMassRadio').prop('checked', true);
-            } else if (editGetData.abdomen === "Varicosities") {
-                $('#varicositiesAbdomenRadio').prop('checked', true);
-            }
-            $('#editModal2').modal('show');
-        },
-        error: function (error) {
-            console.error('Error fetching  data: ' + error);
-        },
-    });
-}
+                // Check the appropriate radio button based on the value
+                if (editGetData.breast === "Normal") {
+                    $('#normalBreastRadio').prop('checked', true);
+                } else if (editGetData.breast === "Mass") {
+                    $('#massBreastRadio').prop('checked', true);
+                } else if (editGetData.breast === "Nipple Discharge") {
+                    $('#nippleDischargeBreastRadio').prop('checked', true);
+                }
 
 
 
+                // Check the appropriate radio button based on the value
+                if (editGetData.abdomen === "Normal") {
+                    $('#normalAbdomenRadio').prop('checked', true);
+                } else if (editGetData.abdomen === "Abdominal Mass") {
+                    $('#abdominalMassRadio').prop('checked', true);
+                } else if (editGetData.abdomen === "Varicosities") {
+                    $('#varicositiesAbdomenRadio').prop('checked', true);
+                }
+                $('#editModal2').modal('show');
+            },
+            error: function (error) {
+                console.error('Error fetching  data: ' + error);
+            },
+        });
+    }
 </script>

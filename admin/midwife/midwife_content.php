@@ -59,11 +59,11 @@ if ($result === false) {
                             <input type="email" class="form-control" id="email" name="email" required>
                             <div id="email_error" class="error"></div>
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="username">Username</label>
                             <input type="text" class="form-control" id="username" name="username" required>
                             <div id="username_error" class="error"></div>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label for="password">Password</label>
                             <div class="input-group">
@@ -116,13 +116,18 @@ if ($result === false) {
             </div>
         </div>
     </div>
+    <style>
+        .tago{
+            display: none;
+        }
+    </style>
     <div class="row">
         <div class="col-12">
             <div class="card-body table-responsive p-0" style="z-index: -99999">
                 <table id="tablebod" class="table table-head-fixed text-nowrap table-striped">
                     <thead class="thead-light">
                         <tr>
-                            <th>ID</th>
+                            <th class="tago">ID</th>
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Birthdate</th>
@@ -136,7 +141,7 @@ if ($result === false) {
                             while ($row = $result->fetch_assoc()) {
                                 ?>
                                 <tr>
-                                    <td class="align-middle">
+                                    <td class="align-middle tago">
                                         <?php echo $row['id']; ?>
                                     </td>
                                     <td class="align-middle">
@@ -165,8 +170,8 @@ if ($result === false) {
                         } else {
                             ?>
                             <tr>
-                                <td class="align-middle">No Midwife Found</td>
                                 <td class="align-middle"></td>
+                                <td class="align-middle">No Midwife Found</td>
                                 <td class="align-middle">
                                 <td>
                                 <td class="align-middle"></td>
@@ -223,11 +228,11 @@ if ($result === false) {
                             <input type="email" class="form-control" id="editEmail" name="email" required>
                             <div id="email_error" class="error"></div>
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="ediuser">Username</label>
                             <input type="text" class="form-control" id="ediuser" name="username" required>
                             <div id="ediuser_error" class="error"></div>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label for="editPassword">Password</label>
                             <div class="input-group">
@@ -284,7 +289,7 @@ if ($result === false) {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script>
+<!-- <script>
     $(document).ready(function () {
         $('#username').on('change', function () {
             var username = $(this).val();
@@ -340,7 +345,7 @@ if ($result === false) {
         });
     });
 
-</script>
+</script> -->
 <script>
     $(document).ready(function () {
 
@@ -352,7 +357,7 @@ if ($result === false) {
         <?php if ($result->num_rows > 0): ?>
             var table = $('#tablebod').DataTable({
                 columnDefs: [
-                    { targets: 0, data: 'id' },
+                    { targets: 0, data: 'id', visible:false },
                     { targets: 1, data: 'first_name' },
                     { targets: 2, data: 'last_name' },
                     { targets: 3, data: 'birthdate' },
@@ -375,7 +380,7 @@ if ($result === false) {
             // Initialize DataTable without the "Action" column when no rows are found
             var table = $('#tablebod').DataTable({
                 columnDefs: [
-                    { targets: 0, data: 'id' },
+                    { targets: 0, data: 'id', visible:false },
                     { targets: 1, data: 'first_name' },
                     { targets: 2, data: 'last_name' },
                     { targets: 3, data: 'birthdate' },
@@ -392,7 +397,7 @@ if ($result === false) {
             table.destroy(); // Destroy the existing DataTable
             table = $('#tablebod').DataTable({
                 columnDefs: [
-                    { targets: 0, data: 'id' },
+                    { targets: 0, data: 'id', visible:false },
                     { targets: 1, data: 'first_name' },
                     { targets: 2, data: 'last_name' },
                     { targets: 3, data: 'birthdate' },
@@ -420,7 +425,7 @@ if ($result === false) {
             var birthdate = $('#birthdate').val();
             var address = $('#address').val();
             var email = $('#email').val();
-            var username = $('#username').val();
+            // var username = $('#username').val();
             var password = $('#password').val();
             // Validate input fields
             var isValid = true;
@@ -457,10 +462,10 @@ if ($result === false) {
                 $('#email_error').text('Field is required');
                 isValid = false;
             }
-            if (username.trim() === '') {
-                $('#username_error').text('Field is required');
-                isValid = false;
-            }
+            // if (username.trim() === '') {
+            //     $('#username_error').text('Field is required');
+            //     isValid = false;
+            // }
 
             if (password.trim() === '') {
                 $('#password_error').text('Field is required');
@@ -479,7 +484,7 @@ if ($result === false) {
                         birthdate: birthdate,
                         address: address,
                         email: email,
-                        username: username,
+                        // username: username,
                         password: password
                     },
                     success: function (response) {
@@ -491,7 +496,7 @@ if ($result === false) {
                             $('#birthdate').val('');
                             $('#address').val('');
                             $('#email').val('');
-                            $('#username').val('');
+                            // $('#username').val('');
                             $('#password').val('');
 
                             updateData();
@@ -605,7 +610,7 @@ if ($result === false) {
                     $('#editModal #editBirthdate').val(editGetData.birthdate);
                     $('#editModal #editAddress').val(editGetData.address);
                     $('#editModal #editEmail').val(editGetData.email);
-                    $('#editModal #ediuser').val(editGetData.username);
+                    // $('#editModal #ediuser').val(editGetData.username);
                     // $('#editModal #editPassword').val(editGetData.password);
 
                     $('#editModal').modal('show');
@@ -626,7 +631,7 @@ if ($result === false) {
             var birthdate = $('#editBirthdate').val();
             var address = $('#editAddress').val();
             var email = $('#editEmail').val();
-            var username = $('#ediuser').val();
+            // var username = $('#ediuser').val();
             var password = $('#editPassword').val();
 
             var isValid = true;
@@ -655,10 +660,10 @@ if ($result === false) {
                 isValid = false;
             }
 
-            if (username.trim() === '') {
-                $('#ediuser_error').text('Field is required');
-                isValid = false;
-            }
+            // if (username.trim() === '') {
+            //     $('#ediuser_error').text('Field is required');
+            //     isValid = false;
+            // }
 
             // if (password.trim() === '') {
             //     $('#editPassword_error').text('Field is required');
@@ -677,7 +682,7 @@ if ($result === false) {
                         birthdate: birthdate,
                         address: address,
                         email: email,
-                        username: username,
+                        // username: username,
                         password: password
                     },
                     success: function (response) {

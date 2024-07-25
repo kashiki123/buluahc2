@@ -445,8 +445,8 @@ if ($result === false) {
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label for="">Select Patient</label>
-                                <select class="form-control" name="patient_id2" id="patient_id2" required>
+                                <label for="">Patient Name</label>
+                                <select class="form-control" name="patient_id2" id="patient_id2" disabled>
                                     <option value="" disabled selected hidden>Select a patient</option>
                                     <?php
 
@@ -482,7 +482,7 @@ if ($result === false) {
                                     <option value="" disabled selected hidden>Select a Status</option>
                                     <option value="Complete">Complete</option>
                                     <option value="Pending">Pending</option>
-                                    <option value="Progress">Progress</option>
+                                    <option value="In Progress">Progress</option>
                                 </select>
                                 <!-- <div id="editStatus_error" class="error"></div> -->
                             </div>
@@ -1162,7 +1162,8 @@ if ($result === false) {
 
 <script>
     // Set the timeout duration (in milliseconds)
-    var inactivityTimeout = 360000; // 10 seconds
+    var inactivityTimeout = 1200000; // 20 minutes
+
 
     // Track user activity
     var activityTimer;
